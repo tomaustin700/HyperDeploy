@@ -10,14 +10,11 @@
             "Name" : "",
             "Replicas" : 1,
             "ProcessorCount" : 1,
-            "MemoryStartupMB" : 1024,
-            "MemoryMaximumMB" : 1024,
+            "MemoryStartupMB" : "1GB",
+            "MemoryMaximumMB" : "4GB",
             "GoldenImagePath" : "",
             "VMHardDiskPath" : "",
-            "CheckpointType" : "Disabled",
-            "Replace" : true
-
-
+            "CheckpointType" : "Disabled"
         }
     ]
 
