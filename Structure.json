@@ -1,0 +1,24 @@
+{
+    "HyperVServers" : [
+        {
+            "Name" : "",
+            "MaxVMCount" : 1
+        }
+    ],
+    "VMs": [
+        {
+            "Name" : "",
+            "Replicas" : 1,
+            "ProcessorCount" : 1,
+            "MemoryStartupMB" : 1024,
+            "MemoryMaximumMB" : 1024,
+            "GoldenImagePath" : "",
+            "VMHardDiskPath" : "",
+            "CheckpointType" : "Disabled",
+            "Replace" : true
+
+
+        }
+    ]
+
+}
