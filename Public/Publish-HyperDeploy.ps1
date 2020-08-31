@@ -40,8 +40,8 @@ function Publish-HyperDeploy {
     #Requires -RunAsAdministrator
 
     $definition = Test-DefinitionFile $DefinitionFile
-
     Test-HyperVServerConnectivity -HyperVServers $definition.HyperVServers
+    Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs
 
     
 
