@@ -21,6 +21,10 @@ function Publish-HyperDeploy {
     .PARAMETER Force
         WARNING - ONLY USE IF YOU FULLY UNDERSTAND THE RAMIFICATIONS, YOU CAN DO A LOT OF DAMAGE WITH THIS. Prevents any additional prompts from being presented such as confirmation prompts. USING THIS WITH STRICT IS VERY DANGEROUS AND SHOULD BE AVOIDED
 
+    .PARAMETER Verbose
+        Shows more details regarding execution and exceptions
+        
+
     #>
 
     Param
@@ -33,33 +37,12 @@ function Publish-HyperDeploy {
         [bool] $Force
     )
 
-}
+    #Requires -RunAsAdministrator
 
-function Test-HyperDeploy {
-    <#
-    .SYNOPSIS
-        Infrastructure as Code deployer for Hyper V.
+    $definition = Test-DefinitionFile $DefinitionFile
 
-    .DESCRIPTION
-        Shows changes that will be made with specified definition file and paramters.
+    Test-HyperVServerConnectivity -HyperVServers $definition.HyperVServers
 
-    .PARAMETER DefinitionFile
-        Json file containing the VM definitions.
-
-    .PARAMETER Replace
-        If a VM already exists that matches a VM declared in the JSON definition file replace the existing VM
-
-    .PARAMETER Strict
-        WARNING - ONLY USE IF YOU FULLY UNDERSTAND THE RAMIFICATIONS, YOU CAN DO A LOT OF DAMAGE WITH THIS. Will remove any pre-existing VM's that are not declared the in VM Definition file.
-
-    #>
-
-    Param
-    (
-        [Parameter(Mandatory)]
-        [String] $DefinitionFile,
-        [bool] $Replace,
-        [bool] $Strict
-    )
+    
 
 }

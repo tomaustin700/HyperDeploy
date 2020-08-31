@@ -1,0 +1,1 @@
+Publish-HyperDeploy -DefinitionFile "C:\Users\Tom\source\repos\HyperDeploy\Structure.json" -Verbose 

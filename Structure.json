@@ -1,13 +1,13 @@
 {
     "HyperVServers" : [
         {
-            "Name" : "",
+            "Name" : "TestServer",
             "MaxVMCount" : 1
         }
     ],
     "VMs": [
         {
-            "Name" : "",
+            "Name" : "TestVM",
             "Replicas" : 1,
             "ProcessorCount" : 1,
             "MemoryStartupMB" : "1GB",
