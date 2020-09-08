@@ -5,5 +5,9 @@ function Submit-VM {
         [VM]$VM,
         [HyperVServer]$HyperVServer
     )
+    
+    Write-Host $HyperVServer.Name
+    Write-Host $VM.Name
+
 
 }

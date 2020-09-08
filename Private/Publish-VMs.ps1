@@ -6,48 +6,61 @@ function Publish-VMs {
         [HyperVServer[]]$HyperVServers
     )
 
-    $hyperVIndex = $null
+    [System.Collections.ArrayList]$VMList = $VMs
+    $HyperVAmount = $HyperVServers.Count
+    $HyperVLists = @{}
+    $Count = 0
+    $FilledVMs = @()
 
-    foreach ($vm in $VMs) {
-        
-        if ($HyperVServers.Count -eq 0) {
-            #Local deploy
-            Submit-VM -VM $vm
+    if ($VMs.Where( { $_.Replicas -gt 0 }, 'First').Count -gt 0) {
+        #Replicas Detected
+        foreach ($replicasRequired in $VMs.Where{ $_.Replicas -gt 0 }) {
+            $VMList.Remove($replicasRequired)
+
+            For ($i = 1; $i -le $replicasRequired.Replicas; $i++) {
+                $replica = $replicasRequired.Clone()
+                $replica.Name = $replica.Name + $i
+                $replica.Replicas = 0
+                $VMList.Add($replica) > $null
+            }
         }
-        else {
-            #Win RM Deploy
+    }
+   
+    do {
 
-            
-            if ($HyperVServers.Count -eq 1) {
-                $hyperVIndex = 0
+        $VMList.ToArray() | ForEach-Object {
+            $Server = $HyperVServers[$Count % $HyperVAmount]
+            if (($HyperVLists[$Server].Count + 1) -le $Server.MaxVMCount) {
+                $HyperVLists[$Server] += @($_)
+                $VMList.Remove($_)
             }
-            else {
+            $Count++
+        }
 
-                if (!$hyperVIndex) {
-                    #First iteration so just use first Hyper-V Server
-                    $hyperVIndex = 0
-                    
-                }
-                else {
-                    $reqIndex = $hyperVIndex + 1
-                    if ($HyperVServers[$reqIndex]) {
-                        $hyperVIndex = $reqIndex
-                    }
-                    else {
-                        $hyperVIndex = 0
-                    }
-                }
 
+        foreach ($server in $HyperVServers | Where-Object { $FilledVMs -notcontains $_.Name }) {
+
+            $sName = $server.Name
+            $n = $HyperVLists.Keys | Where-Object { $_.Name -eq $sName } | Select-Object 
+            $c = $HyperVLists[$n]
+            $l = $c.Length
+            $mvmc = $server.MaxVMCount
+
+            if ($mvmc -eq $l) {
+                $FilledVMs += $sName
             }
+        }
 
-            #Check Server has capacity
-            if ($HyperVServers[$hyperVIndex].MaxVMCount -gt 0) {
-                if ((Get-VM -ComputerName $HyperVServers[$hyperVIndex].Name | Measure-Object).Count -ge $HyperVServers[$hyperVIndex].MaxVMCount) {
-                    
-                }
-            }
+        if ($FilledVMs.Length -eq $HyperVServers.Length -and $VMList.Count -gt 0) {
+            Write-Host "Not enough Hypervisor capacity for VM's" -ForegroundColor Red
+            Exit 1
+        }
 
-            Submit-VM -VM $vm -HyperVServer $hyperVServer
+    }while ($VMList.Count -gt 0) 
+
+    foreach ($key in $HyperVLists.Keys) {
+        foreach($vm in $HyperVLists[$key]){
+            Submit-VM -VM $vm -HyperVServer $key
         }
     }
 }

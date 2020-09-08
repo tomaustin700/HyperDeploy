@@ -3,7 +3,16 @@ class HyperVServer {
     [int]$MaxVMCount
 }
 
-class VM {
+class VM:System.ICloneable {
+
+    [Object] Clone () {
+        $NewVM = [VM]::New()
+        foreach ($Property in ($this | Get-Member -MemberType Property)) {
+            $NewVM.$($Property.Name) = $this.$($Property.Name)
+        } # foreach
+        return $NewVM
+    }
+
     [string]$Name
     [int]$Replicas
     [int]$ProcessorCount
