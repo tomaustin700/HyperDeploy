@@ -1,9 +1,42 @@
+function Confirm-ExistingVMRemoval {
+    Param
+    (
+        [Parameter(Mandatory)]
+        [VM]$VM,
+        [HyperVServer[]]$HyperVServers,
+        [bool] $Replace,
+        [bool] $Force
+    )
+
+    $existingVM, $existingHypervisor = Assert-VMAlreadyExists -VM $VM -HyperVServers $HyperVServers
+    if ($existingVM -and $Replace -and !$Force) {
+        $name = $existingVM.Name
+        Write-Host "$name already exists, replace?" -ForegroundColor Red
+        $ReplaceConfirm = Read-Host "Press Y to confirm" 
+        if ($ReplaceConfirm.ToLower() -eq "y") {
+            Remove-ExistingVM -VM $VM -HyperVServer $existingHypervisor
+            Submit-VM -VM $VM -HyperVServer $key
+        }
+    }
+    elseif ($existingVM -and $Replace -and $Force) {
+        Remove-ExistingVM -VM $VM -HyperVServer $existingHypervisor
+        Submit-VM -VM $VM -HyperVServer $key
+    }
+    elseif (!$existingVM) {
+        Submit-VM -VM $VM -HyperVServer $key
+    }
+
+}
+
 function Publish-VMs {
     Param
     (
         [Parameter(Mandatory)]
         [VM[]]$VMs,
-        [HyperVServer[]]$HyperVServers
+        [HyperVServer[]]$HyperVServers,
+        [bool] $Replace,
+        [bool] $Clean,
+        [bool] $Force
     )
 
     [System.Collections.ArrayList]$VMList = $VMs
@@ -61,13 +94,13 @@ function Publish-VMs {
 
         foreach ($key in $HyperVLists.Keys) {
             foreach ($vm in $HyperVLists[$key]) {
-                Submit-VM -VM $vm -HyperVServer $key
+                Confirm-ExistingVMRemoval -VM $vm -HyperVServers $HyperVServers -Replace $Replace -Force $Force
             }
         }
     }
     else {
         foreach ($vm in $VMList) {
-            Submit-VM -VM $vm 
+            Confirm-ExistingVMRemoval -VM $vm -HyperVServers $HyperVServers -Replace $Replace -Force $Force
         }
     }
 }

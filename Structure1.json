@@ -1,0 +1,22 @@
+{
+    "HyperVServers" : [
+        {
+            "Name" : "Testripper",
+            "MaxVMCount" : 10
+        }
+       
+    ],
+    "VMs": [
+        {
+            "Name" : "Automation10",
+            "ProcessorCount" : 1,
+            "MemoryStartupMB" : "1GB",
+            "MemoryMaximumMB" : "4GB",
+            "GoldenImagePath" : "",
+            "VMHardDiskPath" : "",
+            "CheckpointType" : "Disabled"
+        }
+       
+    ]
+
+}
