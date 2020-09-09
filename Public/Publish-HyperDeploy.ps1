@@ -15,11 +15,11 @@ function Publish-HyperDeploy {
     .PARAMETER PostCreateScript
         Windows Only - Powershell script to run once VM has been created and Win RM can connect. Main use if for when deploying a Packer image to do further configuration once VM deployed.
 
-    .PARAMETER Strict
+    .PARAMETER Clean
         WARNING - ONLY USE IF YOU FULLY UNDERSTAND THE RAMIFICATIONS, YOU CAN DO A LOT OF DAMAGE WITH THIS. Will remove any pre-existing VM's that are not declared the in VM Definition file.
 
     .PARAMETER Force
-        WARNING - ONLY USE IF YOU FULLY UNDERSTAND THE RAMIFICATIONS, YOU CAN DO A LOT OF DAMAGE WITH THIS. Prevents any additional prompts from being presented such as confirmation prompts. USING THIS WITH STRICT IS VERY DANGEROUS AND SHOULD BE AVOIDED
+        WARNING - ONLY USE IF YOU FULLY UNDERSTAND THE RAMIFICATIONS, YOU CAN DO A LOT OF DAMAGE WITH THIS. Prevents any additional prompts from being presented such as confirmation prompts. USING THIS WITH CLEAN IS VERY DANGEROUS AND SHOULD BE AVOIDED
 
     .PARAMETER Verbose
         Shows more details regarding execution and exceptions
