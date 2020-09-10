@@ -15,15 +15,15 @@ function Confirm-ExistingVMRemoval {
         $ReplaceConfirm = Read-Host "Press Y to confirm" 
         if ($ReplaceConfirm.ToLower() -eq "y") {
             Remove-VM  $VM.Name -ComputerName $existingHypervisor
-            Submit-VM -VM $VM -HyperVServer $key
+            Add-VM -VM $VM -HyperVServer $key
         }
     }
     elseif ($existingVM -and $Replace -and $Force) {
         Remove-VM  $VM.Name -ComputerName $existingHypervisor
-        Submit-VM -VM $VM -HyperVServer $key
+        Add-VM -VM $VM -HyperVServer $key
     }
     elseif (!$existingVM) {
-        Submit-VM -VM $VM -HyperVServer $key
+        Add-VM -VM $VM -HyperVServer $key
     }
 
 }

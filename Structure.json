@@ -22,7 +22,8 @@
             "MemoryMaximumMB" : "4GB",
             "GoldenImagePath" : "",
             "VMHardDiskPath" : "",
-            "CheckpointType" : "Disabled"
+            "CheckpointType" : "Disabled",
+            "SwitchName": "Switch"
         },
         {
             "Name" : "Test",
@@ -31,7 +32,8 @@
             "MemoryMaximumMB" : "4GB",
             "GoldenImagePath" : "",
             "VMHardDiskPath" : "",
-            "CheckpointType" : "Disabled"
+            "CheckpointType" : "Disabled",
+            "SwitchName": "Switch"
         }
     ]
 
