@@ -132,6 +132,10 @@ Function Remove-VM {
                             #remove the VM
                             $VM | ForEach-Object {
                                 Write-Verbose "Removing virtual machine $($_.name)"
+                                $State = (Get-VM $_.Name).State
+                                if (!($State -eq "Off")){
+                                    Stop-VM -Name $_.Name -TurnOff 
+                                }
                                 Remove-VM -Name $_.Name -Force
                             } #foreach
                         } #if disk remove was successful

@@ -25,7 +25,7 @@ function Test-DefinitionFile {
                 $issues += "$name - GoldenImagePath is not a valid UNC path, UNC paths should start with \\"
             }
 
-            if (!definitionVM.VMHardDiskPath -and ($definitionVM.NewVMDiskSizeBytes -Or $definitionVM.GoldenImagePath)){
+            if (!$definitionVM.VMHardDiskPath -and ($definitionVM.NewVMDiskSizeBytes -Or $definitionVM.GoldenImagePath)){
                 $issues += "$name - You must specify VMHardDiskPath when setting NewVMDiskSizeBytes or GoldenImagePath"
             }
 

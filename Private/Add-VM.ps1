@@ -3,7 +3,8 @@ function Add-VM {
     (
         [Parameter(Mandatory)]
         [VM]$VM,
-        [HyperVServer]$HyperVServer
+        [HyperVServer]$HyperVServer,
+        [DeploymentOptions]$DeploymentOptions 
     )
     
     $NewVMParams = @{ 
@@ -138,6 +139,19 @@ function Add-VM {
         }
 
         Add-VMHardDiskDrive @AddVMHardDiskDriveParams
+    }
+
+    if ($DeploymentOptions -and $DeploymentOptions.StartAfterCreation){
+
+        $StartVMParams = @{ 
+            Name = $VM.Name
+        }
+
+        if ($HyperVServer) {
+            $StartVMParams.Add("ComputerName", $HyperVServer.Name)
+        }
+
+        Start-VM @StartVMParams
     }
 
 }

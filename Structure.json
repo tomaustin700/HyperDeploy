@@ -1,40 +1,42 @@
 {
-    "HyperVServers" : [
+    "DeploymentOptions": {
+        "StartAfterCreation": true
+    },
+    "HyperVServers": [
         {
-            "Name" : "TestServer",
-            "MaxVMCount" : 10
+            "Name": "TestServer",
+            "MaxVMCount": 10
         },
         {
-            "Name" : "TestServer1",
-            "MaxVMCount" : 5
+            "Name": "TestServer1",
+            "MaxVMCount": 5
         },
         {
-            "Name" : "TestServer2",
-            "MaxVMCount" : 2
+            "Name": "TestServer2",
+            "MaxVMCount": 2
         }
     ],
     "VMs": [
         {
-            "Name" : "TestVM",
-            "Replicas" : 16,
-            "ProcessorCount" : 1,
-            "MemoryStartupBytes" : "1GB",
-            "MemoryMaximumBytes" : "4GB",
-            "GoldenImagePath" : "",
-            "VMHardDiskPath" : "",
-            "CheckpointType" : "Disabled",
+            "Name": "TestVM",
+            "Replicas": 16,
+            "ProcessorCount": 1,
+            "MemoryStartupBytes": "1GB",
+            "MemoryMaximumBytes": "4GB",
+            "GoldenImagePath": "",
+            "VMHardDiskPath": "",
+            "CheckpointType": "Disabled",
             "SwitchName": "Switch"
         },
         {
-            "Name" : "Test",
-            "ProcessorCount" : 1,
-            "MemoryStartupBytes" : "1GB",
-            "MemoryMaximumBytes" : "4GB",
-            "GoldenImagePath" : "",
-            "VMHardDiskPath" : "",
-            "CheckpointType" : "Disabled",
+            "Name": "Test",
+            "ProcessorCount": 1,
+            "MemoryStartupBytes": "1GB",
+            "MemoryMaximumBytes": "4GB",
+            "GoldenImagePath": "",
+            "VMHardDiskPath": "",
+            "CheckpointType": "Disabled",
             "SwitchName": "Switch"
         }
     ]
-
 }

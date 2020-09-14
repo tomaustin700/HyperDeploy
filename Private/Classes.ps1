@@ -25,7 +25,12 @@ class VM:System.ICloneable {
     [string]$NewVMDiskSizeBytes
 }
 
+class DeploymentOptions {
+    [bool]$StartAfterCreation
+}
+
 class Definition {
+    [DeploymentOptions]$DeploymentOptions
     [HyperVServer[]]$HyperVServers
     [VM[]]$VMs
 }

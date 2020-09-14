@@ -5,7 +5,8 @@ function Confirm-ExistingVMRemoval {
         [VM]$VM,
         [HyperVServer[]]$HyperVServers,
         [bool] $Replace,
-        [bool] $Force
+        [bool] $Force,
+        [DeploymentOptions] $DeploymentOptions
     )
 
     $existingVM, $existingHypervisor = Assert-VMAlreadyExists -VM $VM -HyperVServers $HyperVServers
@@ -15,15 +16,15 @@ function Confirm-ExistingVMRemoval {
         $ReplaceConfirm = Read-Host "Press Y to confirm" 
         if ($ReplaceConfirm.ToLower() -eq "y") {
             Remove-VM  $VM.Name -ComputerName $existingHypervisor
-            Add-VM -VM $VM -HyperVServer $key
+            Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions
         }
     }
     elseif ($existingVM -and $Replace -and $Force) {
         Remove-VM  $VM.Name -ComputerName $existingHypervisor
-        Add-VM -VM $VM -HyperVServer $key
+        Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions
     }
     elseif (!$existingVM) {
-        Add-VM -VM $VM -HyperVServer $key
+        Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions
     }
 
 }
@@ -34,6 +35,7 @@ function Publish-VMs {
         [Parameter(Mandatory)]
         [VM[]]$VMs,
         [HyperVServer[]]$HyperVServers,
+        [DeploymentOptions]$DeploymentOptions,
         [bool] $Replace,
         [bool] $Clean,
         [bool] $Force
@@ -94,13 +96,13 @@ function Publish-VMs {
 
         foreach ($key in $HyperVLists.Keys) {
             foreach ($vm in $HyperVLists[$key]) {
-                Confirm-ExistingVMRemoval -VM $vm -HyperVServers $HyperVServers -Replace $Replace -Force $Force
+                Confirm-ExistingVMRemoval -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force
             }
         }
     }
     else {
         foreach ($vm in $VMList) {
-            Confirm-ExistingVMRemoval -VM $vm -HyperVServers $HyperVServers -Replace $Replace -Force $Force
+            Confirm-ExistingVMRemoval -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force
         }
     }
 }

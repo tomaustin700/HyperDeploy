@@ -1,13 +1,14 @@
 {
-  
+    "DeploymentOptions": {
+        "StartAfterCreation": false
+    },
     "VMs": [
         {
-            "Name" : "Automation10",
+            "Name" : "Automation",
             "ProcessorCount" : 1,
             "MemoryStartupBytes" : "1GB",
             "MemoryMaximumBytes" : "4GB",
-            "GoldenImagePath" : "C:\\VMTest.vhdx",
-            "VMHardDiskPath" : "C:\\VMTest",
+            "Replicas" : 5,
             "CheckpointType" : "Disabled"
         }
        
