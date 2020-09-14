@@ -6,8 +6,8 @@
             "ProcessorCount" : 1,
             "MemoryStartupBytes" : "1GB",
             "MemoryMaximumBytes" : "4GB",
-            "GoldenImagePath" : "",
-            "VMHardDiskPath" : "",
+            "GoldenImagePath" : "C:\\VMTest.vhdx",
+            "VMHardDiskPath" : "C:\\VMTest",
             "CheckpointType" : "Disabled"
         }
        

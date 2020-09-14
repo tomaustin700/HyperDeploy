@@ -21,7 +21,8 @@ class VM:System.ICloneable {
     [string]$GoldenImagePath
     [string]$VMHardDiskPath
     [string]$CheckpointType
-    [String]$SwitchName
+    [string]$SwitchName
+    [string]$NewVMDiskSizeBytes
 }
 
 class Definition {

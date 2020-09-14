@@ -44,6 +44,7 @@ function Publish-HyperDeploy {
         $definition = Test-DefinitionFile $DefinitionFile
         #Test-HyperVServerConnectivity -HyperVServers $definition.HyperVServers
         Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs -Replace $Replace -Clean $Clean -Force $Force
+        Clear-TempFiles -HyperVServers $definition.HyperVServers 
     }
 
 }
