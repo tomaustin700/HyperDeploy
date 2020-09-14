@@ -179,5 +179,3 @@ Function Remove-VM {
     }
  
 } 
-
-Remove-VM "New Virtual Machine" 

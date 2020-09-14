@@ -1,4 +1,5 @@
 function Publish-HyperDeploy {
+    [CmdletBinding(SupportsShouldProcess)]
     <#
     .SYNOPSIS
         Infrastructure as Code deployer for Hyper V.
@@ -31,18 +32,18 @@ function Publish-HyperDeploy {
     (
         [Parameter(Mandatory)]
         [String] $DefinitionFile,
-        [bool] $Replace,
+        [Switch] $Replace,
         [String] $PostCreateScript,
-        [bool] $Clean,
-        [bool] $Force
+        [Switch] $Clean,
+        [Switch] $Force 
     )
 
     #Requires -RunAsAdministrator
 
-    $definition = Test-DefinitionFile $DefinitionFile
-    #Test-HyperVServerConnectivity -HyperVServers $definition.HyperVServers
-    Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs -Replace $Replace -Clean $Clean -Force $Force
-
-    
+    if ($PSCmdlet.ShouldProcess("Target", "Operation")){
+        $definition = Test-DefinitionFile $DefinitionFile
+        #Test-HyperVServerConnectivity -HyperVServers $definition.HyperVServers
+        Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs -Replace $Replace -Clean $Clean -Force $Force
+    }
 
 }

@@ -21,6 +21,9 @@ function Assert-VMAlreadyExists {
     }
     else {
         $ExistingVM = get-vm -name $VM.Name -ErrorAction SilentlyContinue  
+        if ($ExistingVM){
+            $ExistsOn = $env:COMPUTERNAME
+        }
     }
 
     return ($ExistingVM, $ExistsOn)

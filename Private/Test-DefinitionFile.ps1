@@ -12,9 +12,8 @@ function Test-DefinitionFile {
     }
     catch {
         Write-Host "Unable to parse definition file" -ForegroundColor Red
-        if ($Verbose) {
-            Write-Host $_.Exception
-        }
+        Write-Host $_.Exception
+        
     }
 
     return $definition

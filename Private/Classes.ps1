@@ -9,15 +9,15 @@ class VM:System.ICloneable {
         $NewVM = [VM]::New()
         foreach ($Property in ($this | Get-Member -MemberType Property)) {
             $NewVM.$($Property.Name) = $this.$($Property.Name)
-        } # foreach
+        }
         return $NewVM
     }
 
     [string]$Name
     [int]$Replicas
     [int]$ProcessorCount
-    [string]$MemoryStartupMB
-    [string]$MemoryMaximumMB
+    [string]$MemoryStartupBytes
+    [string]$MemoryMaximumBytes
     [string]$GoldenImagePath
     [string]$VMHardDiskPath
     [string]$CheckpointType
