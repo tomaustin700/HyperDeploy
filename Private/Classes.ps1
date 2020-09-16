@@ -23,6 +23,7 @@ class VM:System.ICloneable {
     [string]$CheckpointType
     [string]$SwitchName
     [string]$NewVMDiskSizeBytes
+    [string]$ProvisionScript
 }
 
 class DeploymentOptions {

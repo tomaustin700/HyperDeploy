@@ -2,7 +2,12 @@
     "DeploymentOptions": {
         "StartAfterCreation": false
     },
-    
+    "HyperVServers": [
+        {
+            "Name": "LAPTOPWAKFK1WVL",
+            "MaxVMCount": 10
+        }
+    ],
     "VMs": [
         {
             "Name": "Automation",
@@ -10,7 +15,8 @@
             "MemoryStartupBytes": "1GB",
             "MemoryMaximumBytes": "4GB",
             "Replicas": 5,
-            "CheckpointType": "Disabled"
+            "CheckpointType": "Disabled",
+            "ProvisionScript": "C:\\Test.ps1"
         }
     ]
 }

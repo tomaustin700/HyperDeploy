@@ -1,4 +1,4 @@
-function Confirm-ExistingVMRemoval {
+function Confirm-ExistingVMRemovalAndAdd {
     Param
     (
         [Parameter(Mandatory)]
@@ -93,9 +93,12 @@ function Publish-VMs {
     }while ($VMList.Count -gt 0) 
 
     foreach ($key in $HyperVLists.Keys) {
+        Write-Host "Adding Virtual Machines" -ForegroundColor Yellow
         foreach ($vm in $HyperVLists[$key]) {
-            Confirm-ExistingVMRemoval -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force
+            Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force
         }
+        Write-Host "Virtual Machines Added" -ForegroundColor Green
+
     }
     
    

@@ -3,6 +3,7 @@ function Add-VM {
     (
         [Parameter(Mandatory)]
         [VM]$VM,
+        [Parameter(Mandatory)]
         [HyperVServer]$HyperVServer,
         [DeploymentOptions]$DeploymentOptions 
     )
@@ -102,6 +103,10 @@ function Add-VM {
         }
 
         Start-VM @StartVMParams
+
+        if ($VM.ProvisionScript){
+            Initialize-VM -VM $VM
+        }
     }
 
 }

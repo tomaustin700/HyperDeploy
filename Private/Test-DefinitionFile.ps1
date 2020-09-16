@@ -29,6 +29,17 @@ function Test-DefinitionFile {
                 $issues += "$name - You must specify VMHardDiskPath when setting NewVMDiskSizeBytes or GoldenImagePath"
             }
 
+            if ($definitionVM.ProvisionScript -and !$definitionVM.GoldenImagePath){
+                $issues += "$name - ProvisionScript can only be used if GoldenImagePath set"
+            }
+
+            if ($definitionVM.ProvisionScript -and !$definition.DeploymentOptions.StartAfterCreation){
+                $issues += "$name - ProvisionScript can only be used if DeploymentOptions.StartAfterCreation is true"
+            }
+            elseif ($definitionVM.ProvisionScript -and $definition.DeploymentOptions.StartAfterCreation -and !$definitionVM.ProvisionScript.ToLower().EndsWith("psd1"))
+            {
+                $issues += "$name - ProvisionScript must be a valid ps1 file"
+            }
 
         }
 

@@ -13,9 +13,6 @@ function Publish-HyperDeploy {
     .PARAMETER Replace
         If a VM already exists that matches a VM declared in the JSON definition file replace the existing VM
 
-    .PARAMETER PostCreateScript
-        Windows Only - Powershell script to run once VM has been created and Win RM can connect. Main use if for when deploying a Packer image to do further configuration once VM deployed.
-
     .PARAMETER Clean
         WARNING - ONLY USE IF YOU FULLY UNDERSTAND THE RAMIFICATIONS, YOU CAN DO A LOT OF DAMAGE WITH THIS. Will remove any pre-existing VM's that are not declared the in VM Definition file.
 
@@ -33,23 +30,22 @@ function Publish-HyperDeploy {
         [Parameter(Mandatory)]
         [String] $DefinitionFile,
         [Switch] $Replace,
-        [String] $PostCreateScript,
         [Switch] $Clean,
         [Switch] $Force 
     )
 
     #Requires -RunAsAdministrator
 
-    if ($PSCmdlet.ShouldProcess("Target", "Operation")){
+    if ($PSCmdlet.ShouldProcess("Target", "Operation")) {
         $definition = Test-DefinitionFile $DefinitionFile
 
-        if (!$definition.HyperVServers -or $definition.HyperVServers.Count -gt 0){
+        if (!$definition.HyperVServers -or $definition.HyperVServers.Count -gt 0) {
             $definition.HyperVServers = @()
-            $definition.HyperVServers += [HyperVServer]@{name=$env:computername}
+            $definition.HyperVServers += [HyperVServer]@{name = $env:computername }
         }
 
-        foreach($hyperVServer in $definition.HyperVServers){
-            if (!$hyperVServer.MaxVMCount){
+        foreach ($hyperVServer in $definition.HyperVServers) {
+            if (!$hyperVServer.MaxVMCount) {
                 $hyperVServer.MaxVMCount = 9999999
             }
         }
