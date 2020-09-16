@@ -4,21 +4,19 @@ function Clear-TempFiles {
         [HyperVServer[]]$HyperVServers
     )
 
-    if ($HyperVServers) {
-        foreach ($server in $HyperVServers) {
-            Invoke-Command -ComputerName $server.Name {
+    foreach ($server in $HyperVServers) {
+        Invoke-Command -ComputerName $server.Name {
 
-                $temp = $env:TEMP
-                $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
+            $temp = $env:TEMP
+            $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
 
-                if (Test-Path $tempGI) {
-                    Remove-Item $tempGI -Force
-                }
-
+            if (Test-Path $tempGI) {
+                Remove-Item $tempGI -Force
             }
+
         }
     }
-
+    
     $temp = $env:TEMP
     $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
 

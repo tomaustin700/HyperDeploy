@@ -1,6 +1,6 @@
 class HyperVServer {
     [string]$Name
-    [int]$MaxVMCount
+    [System.Nullable[int]]$MaxVMCount
 }
 
 class VM:System.ICloneable {

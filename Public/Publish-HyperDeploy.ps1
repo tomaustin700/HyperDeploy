@@ -42,7 +42,19 @@ function Publish-HyperDeploy {
 
     if ($PSCmdlet.ShouldProcess("Target", "Operation")){
         $definition = Test-DefinitionFile $DefinitionFile
-        #Test-HyperVServerConnectivity -HyperVServers $definition.HyperVServers
+
+        if (!$definition.HyperVServers -or $definition.HyperVServers.Count -gt 0){
+            $definition.HyperVServers = @()
+            $definition.HyperVServers += [HyperVServer]@{name=$env:computername}
+        }
+
+        foreach($hyperVServer in $definition.HyperVServers){
+            if (!$hyperVServer.MaxVMCount){
+                $hyperVServer.MaxVMCount = 9999999
+            }
+        }
+
+        Test-HyperVServerConnectivity -HyperVServers $definition.HyperVServers
         Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace -Clean $Clean -Force $Force
         Clear-TempFiles -HyperVServers $definition.HyperVServers 
     }

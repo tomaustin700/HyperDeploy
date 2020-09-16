@@ -56,53 +56,47 @@ function Publish-VMs {
         }
     }
 
-    if ($HyperVServers.Count -gt 0) {
+    $HyperVAmount = $HyperVServers.Count
+    $HyperVLists = @{}
+    $Count = 0
+    $FilledVMs = @()
 
-        $HyperVAmount = $HyperVServers.Count
-        $HyperVLists = @{}
-        $Count = 0
-        $FilledVMs = @()
+    do {
 
-        do {
-
-            $VMList.ToArray() | ForEach-Object {
-                $Server = $HyperVServers[$Count % $HyperVAmount]
-                if (($HyperVLists[$Server].Count + 1) -le $Server.MaxVMCount) {
-                    $HyperVLists[$Server] += @($_)
-                    $VMList.Remove($_)
-                }
-                $Count++
+        $VMList.ToArray() | ForEach-Object {
+            $Server = $HyperVServers[$Count % $HyperVAmount]
+            if (($HyperVLists[$Server].Count + 1) -le $Server.MaxVMCount) {
+                $HyperVLists[$Server] += @($_)
+                $VMList.Remove($_)
             }
+            $Count++
+        }
 
-            foreach ($server in $HyperVServers | Where-Object { $FilledVMs -notcontains $_.Name }) {
+        foreach ($server in $HyperVServers | Where-Object { $FilledVMs -notcontains $_.Name }) {
 
-                $sName = $server.Name
-                $n = $HyperVLists.Keys | Where-Object { $_.Name -eq $sName } | Select-Object 
-                $c = $HyperVLists[$n]
-                $l = $c.Length
-                $mvmc = $server.MaxVMCount
+            $sName = $server.Name
+            $n = $HyperVLists.Keys | Where-Object { $_.Name -eq $sName } | Select-Object 
+            $c = $HyperVLists[$n]
+            $l = $c.Length
+            $mvmc = $server.MaxVMCount
 
-                if ($mvmc -eq $l) {
-                    $FilledVMs += $sName
-                }
-            }
-
-            if ($FilledVMs.Length -eq $HyperVServers.Length -and $VMList.Count -gt 0) {
-                Write-Host "Not enough Hypervisor capacity for VM's" -ForegroundColor Red
-                Exit 1
-            }
-
-        }while ($VMList.Count -gt 0) 
-
-        foreach ($key in $HyperVLists.Keys) {
-            foreach ($vm in $HyperVLists[$key]) {
-                Confirm-ExistingVMRemoval -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force
+            if ($mvmc -eq $l) {
+                $FilledVMs += $sName
             }
         }
-    }
-    else {
-        foreach ($vm in $VMList) {
+
+        if ($FilledVMs.Length -eq $HyperVServers.Length -and $VMList.Count -gt 0) {
+            Write-Host "Not enough Hypervisor capacity for VM's" -ForegroundColor Red
+            Exit 1
+        }
+
+    }while ($VMList.Count -gt 0) 
+
+    foreach ($key in $HyperVLists.Keys) {
+        foreach ($vm in $HyperVLists[$key]) {
             Confirm-ExistingVMRemoval -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force
         }
     }
+    
+   
 }

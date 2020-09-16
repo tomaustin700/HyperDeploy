@@ -2,16 +2,15 @@
     "DeploymentOptions": {
         "StartAfterCreation": false
     },
+    
     "VMs": [
         {
-            "Name" : "Automation",
-            "ProcessorCount" : 1,
-            "MemoryStartupBytes" : "1GB",
-            "MemoryMaximumBytes" : "4GB",
-            "Replicas" : 5,
-            "CheckpointType" : "Disabled"
+            "Name": "Automation",
+            "ProcessorCount": 1,
+            "MemoryStartupBytes": "1GB",
+            "MemoryMaximumBytes": "4GB",
+            "Replicas": 5,
+            "CheckpointType": "Disabled"
         }
-       
     ]
-
 }
