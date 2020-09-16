@@ -3,6 +3,11 @@ class HyperVServer {
     [System.Nullable[int]]$MaxVMCount
 }
 
+class Provisioning {
+    [bool]$RebootAfterEachScript
+    [string[]]$Scripts
+}
+
 class VM:System.ICloneable {
 
     [Object] Clone () {
@@ -23,7 +28,7 @@ class VM:System.ICloneable {
     [string]$CheckpointType
     [string]$SwitchName
     [string]$NewVMDiskSizeBytes
-    [string]$ProvisionScript
+    [Provisioning]$Provisioning
 }
 
 class DeploymentOptions {

@@ -16,7 +16,14 @@
             "MemoryMaximumBytes": "4GB",
             "Replicas": 5,
             "CheckpointType": "Disabled",
-            "ProvisionScript": "C:\\Test.ps1"
+            "Provisioning" : {
+                "RebootAfterEachScript" : true,
+                "Scripts": [
+                    "C:\\Test.ps1",
+                    "C:\\Test.ps1"
+                ] 
+            }
+            
         }
     ]
 }

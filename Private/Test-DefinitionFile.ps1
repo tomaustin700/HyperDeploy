@@ -25,21 +25,29 @@ function Test-DefinitionFile {
                 $issues += "$name - GoldenImagePath is not a valid UNC path, UNC paths should start with \\"
             }
 
-            if (!$definitionVM.VMHardDiskPath -and ($definitionVM.NewVMDiskSizeBytes -Or $definitionVM.GoldenImagePath)){
+            if (!$definitionVM.VMHardDiskPath -and ($definitionVM.NewVMDiskSizeBytes -Or $definitionVM.GoldenImagePath)) {
                 $issues += "$name - You must specify VMHardDiskPath when setting NewVMDiskSizeBytes or GoldenImagePath"
             }
 
-            if ($definitionVM.ProvisionScript -and !$definitionVM.GoldenImagePath){
-                $issues += "$name - ProvisionScript can only be used if GoldenImagePath set"
+            if ($definitionVM.Provisioning) {
+                if ($definitionVM.Provisioning.Scripts -and $definitionVM.Provisioning.Scripts.Length -gt 0 -and !$definitionVM.GoldenImagePath) {
+                    $issues += "$name - Provision Scripts can only be used if GoldenImagePath set"
+                }
+    
+                if ($definitionVM.Provisioning.Scripts -and $definitionVM.Provisioning.Scripts.Length -gt 0 -and !$definition.DeploymentOptions.StartAfterCreation) {
+                    $issues += "$name - Provision Scripts can only be used if DeploymentOptions.StartAfterCreation is true"
+                }
+                elseif ($definitionVM.Provisioning.Scripts -and $definitionVM.Provisioning.Scripts.Length -gt 0 -and $definition.DeploymentOptions.StartAfterCreation) {
+                    foreach($script in $definitionVM.Provisioning.Scripts){
+                        if (!$script.EndsWith("ps1")){
+                            $issues += "$name - $script - Provision Script must be a valid ps1 file"
+
+                        }
+                    } 
+                }
             }
 
-            if ($definitionVM.ProvisionScript -and !$definition.DeploymentOptions.StartAfterCreation){
-                $issues += "$name - ProvisionScript can only be used if DeploymentOptions.StartAfterCreation is true"
-            }
-            elseif ($definitionVM.ProvisionScript -and $definition.DeploymentOptions.StartAfterCreation -and !$definitionVM.ProvisionScript.ToLower().EndsWith("psd1"))
-            {
-                $issues += "$name - ProvisionScript must be a valid ps1 file"
-            }
+           
 
         }
 
