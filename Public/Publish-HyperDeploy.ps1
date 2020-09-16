@@ -37,7 +37,7 @@ function Publish-HyperDeploy {
     #Requires -RunAsAdministrator
 
     if ($PSCmdlet.ShouldProcess("Target", "Operation")) {
-        $definition = Test-DefinitionFile $DefinitionFile
+        $definition = Test-DefinitionFile -DefinitionFile $DefinitionFile
 
         if (!$definition.HyperVServers -or $definition.HyperVServers.Count -gt 0) {
             $definition.HyperVServers = @()

@@ -86,8 +86,7 @@ function Publish-VMs {
         }
 
         if ($FilledVMs.Length -eq $HyperVServers.Length -and $VMList.Count -gt 0) {
-            Write-Host "Not enough Hypervisor capacity for VM's" -ForegroundColor Red
-            Exit 1
+            throw "Not enough Hypervisor capacity for VM's" 
         }
 
     }while ($VMList.Count -gt 0) 

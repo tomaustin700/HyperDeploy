@@ -11,8 +11,8 @@ function Test-HyperVServerConnectivity {
         foreach ($server in $definition.HyperVServers) {
             if (!([bool](Test-WSMan -ComputerName $server.Name))) {
                 $name = $server.Name
-                Write-Host "Unable to connect to $name using WinRM, check that WinRM is enabled and $name is reachable and try again" -ForegroundColor Red 
-                exit
+                throw "Unable to connect to $name using WinRM, check that WinRM is enabled and $name is reachable and try again" 
+                
             }
         }
 

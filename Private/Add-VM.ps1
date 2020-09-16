@@ -53,8 +53,8 @@ function Add-VM {
                     $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
     
                     if (!Test-Path "filesystem::$localPath") {
-                        Write-Host "$path does not exist"
-                        exit 1
+                        throw "$path does not exist"
+                        
                     }
     
                     if (!Test-Path $tempGI) {
@@ -67,8 +67,8 @@ function Add-VM {
                 else {
     
                     if (!Test-Path $path) {
-                        Write-Host "$path does not exist"
-                        exit 1
+                        throw "$path does not exist"
+                        
                     }
     
                     Copy-Item $VM.GoldenImagePath -Destination "$diskPath\Disk.vhdx"
