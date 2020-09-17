@@ -43,7 +43,7 @@ function Publish-HyperDeploy {
     if ($PSCmdlet.ShouldProcess("Target", "Operation")) {
         $definition = Test-DefinitionFile -DefinitionFile $DefinitionFile
 
-        if (!$definition.HyperVServers -or $definition.HyperVServers.Count -gt 0) {
+        if (!$definition.HyperVServers -or $definition.HyperVServers.Count -eq 0) {
             $definition.HyperVServers = @()
             $definition.HyperVServers += [HyperVServer]@{name = $env:computername }
         }

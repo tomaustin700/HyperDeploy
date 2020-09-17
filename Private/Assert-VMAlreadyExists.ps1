@@ -1,8 +1,5 @@
 function Assert-VMAlreadyExists {
 
-    $rootDir = (get-item $PSScriptRoot).Parent.FullName
-    . "$rootDir\Private\Classes"
-
     Param
     (
         [Parameter(Mandatory)]

@@ -68,7 +68,11 @@ function Publish-VMs {
 
     do {
 
-        #Need some logic here to subtract already existing vms from max count
+        foreach ($server in $HyperVServers) {
+            $currentCount = (Get-VM -ComputerName $server.Name | Where-Object { ($VMList | Select-Object -Property Name -ExpandProperty Name) -notcontains $_.Name } ).count
+            $server.MaxVMCount = $server.MaxVMCount - $currentCount
+            $serverCapacity += $server.MaxVMCount
+        }
 
         $VMList.ToArray() | ForEach-Object {
             $Server = $HyperVServers[$Count % $HyperVAmount]
@@ -79,7 +83,7 @@ function Publish-VMs {
             $Count++
         }
 
-        foreach ($server in $HyperVServers | Where-Object { $FilledVMs -notcontains $_.Name }) {
+        foreach ($server in $HyperVServers | Where-Object { $FilledVMs -notcontains $_.Name } | Where-Object { $_.MaxVMCount -gt 0 } ) {
 
             $sName = $server.Name
             $n = $HyperVLists.Keys | Where-Object { $_.Name -eq $sName } | Select-Object 
@@ -92,7 +96,7 @@ function Publish-VMs {
             }
         }
 
-        if ($FilledVMs.Length -eq $HyperVServers.Length -and $VMList.Count -gt 0) {
+        if ($serverCapacity -eq 0 -or ($FilledVMs.Length -eq $HyperVServers.Length -and $VMList.Count -gt 0)) {
             throw "Not enough Hypervisor capacity for VM's" 
         }
 

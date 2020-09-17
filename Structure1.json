@@ -5,7 +5,7 @@
     "HyperVServers": [
         {
             "Name": "LAPTOPWAKFK1WVL",
-            "MaxVMCount": 10
+            "MaxVMCount": 5
         }
     ],
     "VMs": [
@@ -15,14 +15,7 @@
             "MemoryStartupBytes": "1GB",
             "MemoryMaximumBytes": "4GB",
             "Replicas": 5,
-            "CheckpointType": "Disabled",
-            "Provisioning" : {
-                "RebootAfterEachScript" : true,
-                "Scripts": [
-                    "C:\\Test.ps1",
-                    "C:\\Test.ps1"
-                ] 
-            }
+            "CheckpointType": "Disabled"
             
         }
     ]
