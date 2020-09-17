@@ -7,7 +7,9 @@ function Confirm-ExistingVMRemovalAndAdd {
         [HyperVServer[]]$HyperVServers,
         [bool] $Replace,
         [bool] $Force,
-        [DeploymentOptions] $DeploymentOptions
+        [DeploymentOptions] $DeploymentOptions,
+        [PSCredential]$ProvisionCredential
+
     )
 
     $existingVM, $existingHypervisor = Assert-VMAlreadyExists -VM $VM -HyperVServers $HyperVServers
@@ -17,15 +19,15 @@ function Confirm-ExistingVMRemovalAndAdd {
         $ReplaceConfirm = Read-Host "Press Y to confirm" 
         if ($ReplaceConfirm.ToLower() -eq "y") {
             Remove-VM  $VM.Name -ComputerName $existingHypervisor
-            Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions
+            Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions -ProvisionCredential $ProvisionCredential
         }
     }
     elseif ($existingVM -and $Replace -and $Force) {
         Remove-VM  $VM.Name -ComputerName $existingHypervisor
-        Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions
+        Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions -ProvisionCredential $ProvisionCredential
     }
     elseif (!$existingVM) {
-        Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions
+        Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions -ProvisionCredential $ProvisionCredential
     }
 
 }
@@ -39,7 +41,9 @@ function Publish-VMs {
         [DeploymentOptions]$DeploymentOptions,
         [bool] $Replace,
         [bool] $Clean,
-        [bool] $Force
+        [bool] $Force,
+        [PSCredential]$ProvisionCredential
+
     )
 
     [System.Collections.ArrayList]$VMList = $VMs
@@ -100,7 +104,7 @@ function Publish-VMs {
        
         Write-Host "Adding Virtual Machines" -ForegroundColor Yellow
         foreach ($vm in $HyperVLists[$key]) {
-            Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force
+            Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force -ProvisionCredential $ProvisionCredential
         }
         Write-Host "Virtual Machines Added" -ForegroundColor Green
 

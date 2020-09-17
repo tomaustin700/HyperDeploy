@@ -64,13 +64,32 @@ function Initialize-VM {
         [Parameter(Mandatory)]
         [VM]$VM,
         [Parameter(Mandatory)]
-        [HyperVServer]$HyperVServer
+        [HyperVServer]$HyperVServer,
+        [PSCredential]$ProvisionCredential
+
     )
+
+    Set-Item wsman:\localhost\Client\TrustedHosts -value * -Force
 
     $name = $VM.Name
     $script = $VM.ProvisionScript
     Write-Host "Provisioning $name using $script" -ForegroundColor Yellow
     $ip = Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
+
+    foreach($script in $VM.Provisioning.Scripts){
+
+        $script = Get-Content $script
+
+        invoke-command  -ScriptBlock $script -ComputerName $ip -Credential $ProvisionCredential
+
+        if ($VM.Provisioning.RebootAfterEachScript){
+            Stop-VM -Name $name -ComputerName $HyperVServer.Name -Force
+            Start-VM -Name $name -ComputerName $HyperVServer.Name
+    
+            WaitForResponsive-VM $VM -HyperVServer $HyperVServe
+        }
+
+    }
 
 
 }

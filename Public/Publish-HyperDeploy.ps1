@@ -10,6 +10,9 @@ function Publish-HyperDeploy {
     .PARAMETER DefinitionFile
         Json file containing the VM definitions.
 
+    .PARAMETER ProvisionCredential
+        Credentials object used for authentication when running provision scripts
+
     .PARAMETER Replace
         If a VM already exists that matches a VM declared in the JSON definition file replace the existing VM
 
@@ -31,7 +34,8 @@ function Publish-HyperDeploy {
         [String] $DefinitionFile,
         [Switch] $Replace,
         [Switch] $Clean,
-        [Switch] $Force 
+        [Switch] $Force,
+        [PSCredential]$ProvisionCredential
     )
 
     #Requires -RunAsAdministrator
@@ -51,7 +55,7 @@ function Publish-HyperDeploy {
         }
 
         Test-HyperVServerConnectivity -HyperVServers $definition.HyperVServers
-        Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace -Clean $Clean -Force $Force
+        Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace -Clean $Clean -Force $Force -ProvisionCredential $ProvisionCredential
         Clear-TempFiles -HyperVServers $definition.HyperVServers 
     }
 
