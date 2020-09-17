@@ -1,4 +1,5 @@
 function Confirm-ExistingVMRemovalAndAdd {
+
     Param
     (
         [Parameter(Mandatory)]
@@ -63,6 +64,8 @@ function Publish-VMs {
 
     do {
 
+        #Need some logic here to subtract already existing vms from max count
+
         $VMList.ToArray() | ForEach-Object {
             $Server = $HyperVServers[$Count % $HyperVAmount]
             if (($HyperVLists[$Server].Count + 1) -le $Server.MaxVMCount) {
@@ -91,7 +94,10 @@ function Publish-VMs {
 
     }while ($VMList.Count -gt 0) 
 
+    
+
     foreach ($key in $HyperVLists.Keys) {
+       
         Write-Host "Adding Virtual Machines" -ForegroundColor Yellow
         foreach ($vm in $HyperVLists[$key]) {
             Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force
