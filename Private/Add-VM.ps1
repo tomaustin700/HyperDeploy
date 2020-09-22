@@ -54,26 +54,26 @@ function Add-VM {
                     $temp = $env:TEMP
                     $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
     
-                    if (!Test-Path "filesystem::$localPath") {
-                        throw "$path does not exist"
+                    if (!(Test-Path "filesystem::$localPath")) {
+                        throw "$localPath does not exist"
                         
                     }
     
-                    if (!Test-Path $tempGI) {
+                    if (!(Test-Path $tempGI)) {
                         Write-Host "Golden Image Path is UNC, caching locally."
                         Copy-Item $VM.GoldenImagePath -Destination $tempGI
                     }
     
-                    Copy-Item $tempGI -Destination "$diskPath\Disk.vhdx"
+                    Copy-Item $tempGI -Destination "$using:diskPath\Disk.vhdx"
                 }
                 else {
     
-                    if (!Test-Path $path) {
-                        throw "$path does not exist"
+                    if (!(Test-Path $localPath)) {
+                        throw "$localPath does not exist"
                         
                     }
     
-                    Copy-Item $VM.GoldenImagePath -Destination "$diskPath\Disk.vhdx"
+                    Copy-Item $localPath -Destination "$using:diskPath\Disk.vhdx"
                 }
 
             } 
@@ -106,8 +106,18 @@ function Add-VM {
 
         Start-VM @StartVMParams
 
-        if ($VM.ProvisionScript){
-            Initialize-VM -VM $VM -ProvisionCredential $ProvisionCredential
+        if ($VM.Provisioning) {
+
+            $InitializeVMParams = @{ 
+                VM = $VM
+                HyperVServer = $HyperVServer
+            }
+
+            if ($ProvisionCredential) {
+                $InitializeVMParams.Add("ProvisionCredential", $ProvisionCredential)
+            }
+
+            Initialize-VM @InitializeVMParams  
         }
     }
 

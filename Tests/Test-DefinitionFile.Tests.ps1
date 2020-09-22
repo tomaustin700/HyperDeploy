@@ -114,6 +114,7 @@ Describe 'Test-DefinitionFile Tests' {
         `"VMs`": [
             {
                 `"Name`": `"Test`",
+                `"SwitchName`" : `"Test`",
                 `"Provisioning`" : {
                   `"Scripts`": [
                       `"C:\\Test.ps1`"
@@ -124,6 +125,32 @@ Describe 'Test-DefinitionFile Tests' {
     }"
 
     { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - Provision Scripts can only be used if GoldenImagePath set"
+
+  }
+
+  It 'SpecifyingProvisionScriptsRequiresSwitchNameToBeSet_ShouldThrow' {
+
+    $rootDir = (get-item $PSScriptRoot).Parent.FullName
+    . "$rootDir\Private\Test-DefinitionFile"
+    . "$rootDir\Private\Classes"
+
+
+    $defFile = "{
+        `"VMs`": [
+            {
+                `"Name`": `"Test`",
+                `"GoldenImagePath`": `"C:\\Test.vhdx`",
+                `"VMHardDiskPath`" : `"C:\\Test`",
+                `"Provisioning`" : {
+                  `"Scripts`": [
+                      `"C:\\Test.ps1`"
+                  ] 
+              }
+            }
+        ]
+    }"
+
+    { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - Provision Scripts can only be used if SwitchName set"
 
   }
 
@@ -141,6 +168,7 @@ Describe 'Test-DefinitionFile Tests' {
           {
               `"Name`": `"Test`",
               `"GoldenImagePath`": `"C:\\Test.vhdx`",
+              `"SwitchName`" : `"Test`",
               `"VMHardDiskPath`" : `"C:\\Test`",
               `"Provisioning`" : {
                 `"Scripts`": [
@@ -169,6 +197,7 @@ Describe 'Test-DefinitionFile Tests' {
           {
               `"Name`": `"Test`",
               `"GoldenImagePath`": `"C:\\Test.vhdx`",
+              `"SwitchName`" : `"Test`",
               `"VMHardDiskPath`" : `"C:\\Test`",
               `"Provisioning`" : {
                 `"Scripts`": [

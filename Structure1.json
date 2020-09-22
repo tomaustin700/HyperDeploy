@@ -1,6 +1,6 @@
 {
     "DeploymentOptions": {
-        "StartAfterCreation": false
+        "StartAfterCreation": true
     },
     "HyperVServers": [
         {
@@ -14,8 +14,18 @@
             "ProcessorCount": 1,
             "MemoryStartupBytes": "1GB",
             "MemoryMaximumBytes": "4GB",
-            "Replicas": 5,
-            "CheckpointType": "Disabled"
+            "Replicas": 1,
+            "SwitchName": "packer-hyperv-iso",
+            "CheckpointType": "Disabled",
+            "GoldenImagePath" : "C:\\Users\\TomA\\source\\repos\\Agents\\output-hyperv-iso\\Virtual Hard Disks\\automationpacker.vhdx",
+            "VMHardDiskPath" : "C:\\VmTest",
+            "Provisioning" : {
+                "RebootAfterEachScript": false,
+                "Scripts" : [
+                    "C:\\TestScripts\\Script1.ps1"
+                ]
+            }
+
             
         }
     ]

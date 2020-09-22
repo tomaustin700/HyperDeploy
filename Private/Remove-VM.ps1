@@ -80,6 +80,11 @@ Function Remove-VM {
                             "low" { $cv = $True }
                             Default { $cv = $False }
                         }
+
+                        $State = (Get-VM $VM.name).State
+                        if (!($State -eq "Off")) {
+                            Stop-VM -Name $VM.name -TurnOff 
+                        }
  
                         #remove snapshots first
                         #$VM is the pipelinevariable from the wrapped command
@@ -91,7 +96,7 @@ Function Remove-VM {
  
                         $disks = $vm.id | Get-VHD 
             
-                        if ($disks.Count -eq 0){
+                        if ($disks.Count -eq 0) {
                             $DiskRemove = $True
                         }
 
@@ -132,10 +137,6 @@ Function Remove-VM {
                             #remove the VM
                             $VM | ForEach-Object {
                                 Write-Verbose "Removing virtual machine $($_.name)"
-                                $State = (Get-VM $_.Name).State
-                                if (!($State -eq "Off")){
-                                    Stop-VM -Name $_.Name -TurnOff 
-                                }
                                 Remove-VM -Name $_.Name -Force
                             } #foreach
                         } #if disk remove was successful

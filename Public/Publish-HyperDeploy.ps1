@@ -16,9 +16,6 @@ function Publish-HyperDeploy {
     .PARAMETER Replace
         If a VM already exists that matches a VM declared in the JSON definition file replace the existing VM
 
-    .PARAMETER Clean
-        WARNING - ONLY USE IF YOU FULLY UNDERSTAND THE RAMIFICATIONS, YOU CAN DO A LOT OF DAMAGE WITH THIS. Will remove any pre-existing VM's that are not declared the in VM Definition file.
-
     .PARAMETER Force
         WARNING - ONLY USE IF YOU FULLY UNDERSTAND THE RAMIFICATIONS, YOU CAN DO A LOT OF DAMAGE WITH THIS. Prevents any additional prompts from being presented such as confirmation prompts. USING THIS WITH CLEAN IS VERY DANGEROUS AND SHOULD BE AVOIDED
 
@@ -33,7 +30,6 @@ function Publish-HyperDeploy {
         [Parameter(Mandatory)]
         [String] $DefinitionFile,
         [Switch] $Replace,
-        [Switch] $Clean,
         [Switch] $Force,
         [PSCredential]$ProvisionCredential
     )
@@ -55,7 +51,7 @@ function Publish-HyperDeploy {
         }
 
         Test-HyperVServerConnectivity -HyperVServers $definition.HyperVServers
-        Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace -Clean $Clean -Force $Force -ProvisionCredential $ProvisionCredential
+        Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -ProvisionCredential $ProvisionCredential
         Clear-TempFiles -HyperVServers $definition.HyperVServers 
     }
 

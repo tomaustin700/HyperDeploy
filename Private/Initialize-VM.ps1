@@ -33,15 +33,19 @@ function Wait-ForResponsiveVM {
         Start-Sleep -Seconds 1
 
         $name = $VM.Name
-        Write-Output "$name has no IP yet. Waiting"
+        Write-Host "$name has no IP yet. Waiting"
 
     }
 
     #Get VM IP Address
     $IP = (Get-VMNetworkAdapter -VMName $VM.Name -ComputerName $HyperVServer.Name).IpAddresses[0] 
 
+    write-Host "IP is $IP"
+    Write-Host "Waiting for WinRM"
+
     #Wait for WINRM to be responsive
     $failedWSMan = $false
+    $Future5 = (Get-Date).AddMinutes(5)
 
     do { 
         $failedWSMan = $false
@@ -53,7 +57,7 @@ function Wait-ForResponsiveVM {
         }
 
 
-    }while ($failedWSMan)
+    }while ($failedWSMan -and (Get-Date) -lt ($Future5))
 
     return $IP
 }
@@ -72,21 +76,26 @@ function Initialize-VM {
     Set-Item wsman:\localhost\Client\TrustedHosts -value * -Force
 
     $name = $VM.Name
-    $script = $VM.ProvisionScript
-    Write-Host "Provisioning $name using $script" -ForegroundColor Yellow
+   
     $ip = Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
+    if ($ip) {
+        Write-Host "WinRM connection established"
+    }
+    else {
+        break "Timed out waiting for WinRM"
+    }
 
-    foreach($script in $VM.Provisioning.Scripts){
+    foreach ($script in $VM.Provisioning.Scripts) {
 
-        $script = Get-Content $script
+        Write-Host "Provisioning $name using $script" -ForegroundColor Yellow
+        
+        invoke-command -ComputerName $ip[1] -FilePath $script -Credential $ProvisionCredential
 
-        invoke-command  -ScriptBlock $script -ComputerName $ip -Credential $ProvisionCredential
-
-        if ($VM.Provisioning.RebootAfterEachScript){
+        if ($VM.Provisioning.RebootAfterEachScript) {
             Stop-VM -Name $name -ComputerName $HyperVServer.Name -Force
             Start-VM -Name $name -ComputerName $HyperVServer.Name
     
-            WaitForResponsive-VM $VM -HyperVServer $HyperVServe
+            Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
         }
 
     }

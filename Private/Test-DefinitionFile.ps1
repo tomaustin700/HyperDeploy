@@ -14,6 +14,10 @@ function Test-DefinitionFile {
         $definition = [Definition]($DefinitionJson | ConvertFrom-Json)
     }
 
+    if (!$definition){
+        break "Invalid definition file"
+    }
+
     foreach ($definitionVM in $definition.VMs) {
         $name = $definitionVM.Name
             
@@ -36,6 +40,10 @@ function Test-DefinitionFile {
         if ($definitionVM.Provisioning) {
             if ($definitionVM.Provisioning.Scripts -and $definitionVM.Provisioning.Scripts.Length -gt 0 -and !$definitionVM.GoldenImagePath) {
                 throw "$name - Provision Scripts can only be used if GoldenImagePath set"
+            }
+
+            if ($definitionVM.Provisioning.Scripts -and $definitionVM.Provisioning.Scripts.Length -gt 0 -and !$definitionVM.SwitchName) {
+                throw "$name - Provision Scripts can only be used if SwitchName set"
             }
     
             if ($definitionVM.Provisioning.Scripts -and $definitionVM.Provisioning.Scripts.Length -gt 0 -and !$definition.DeploymentOptions.StartAfterCreation) {

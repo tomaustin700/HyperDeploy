@@ -40,7 +40,6 @@ function Publish-VMs {
         [HyperVServer[]]$HyperVServers,
         [DeploymentOptions]$DeploymentOptions,
         [bool] $Replace,
-        [bool] $Clean,
         [bool] $Force,
         [PSCredential]$ProvisionCredential
 
