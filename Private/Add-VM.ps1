@@ -111,10 +111,7 @@ function Add-VM {
             $InitializeVMParams = @{ 
                 VM = $VM
                 HyperVServer = $HyperVServer
-            }
-
-            if ($ProvisionCredential) {
-                $InitializeVMParams.Add("ProvisionCredential", $ProvisionCredential)
+                ProvisionCredential = $ProvisionCredential
             }
 
             Initialize-VM @InitializeVMParams  
