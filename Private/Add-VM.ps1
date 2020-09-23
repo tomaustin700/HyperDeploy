@@ -60,10 +60,12 @@ function Add-VM {
                     }
     
                     if (!(Test-Path $tempGI)) {
-                        Write-Host "Golden Image Path is UNC, caching locally."
+                        Write-Verbose "Golden Image Path is UNC, caching locally."
                         Copy-Item $VM.GoldenImagePath -Destination $tempGI
                     }
-    
+                    
+                    Write-Verbose "Copying golden image"
+
                     Copy-Item $tempGI -Destination "$using:diskPath\Disk.vhdx"
                 }
                 else {
@@ -72,7 +74,9 @@ function Add-VM {
                         throw "$localPath does not exist"
                         
                     }
-    
+
+                    Write-Verbose "Copying golden image"
+
                     Copy-Item $localPath -Destination "$using:diskPath\Disk.vhdx"
                 }
 

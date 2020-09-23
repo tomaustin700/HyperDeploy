@@ -85,11 +85,25 @@ function Initialize-VM {
         break "Timed out waiting for WinRM"
     }
 
+    $newCred = $null
+
     foreach ($script in $VM.Provisioning.Scripts) {
 
         Write-Host "Provisioning $name using $script" -ForegroundColor Yellow
+
+        $InvokeParams = @{ 
+            FilePath     = $script
+            ComputerName = $ip[1]
+        }
+    
+        if (!$newCred) {
+            $InvokeParams.Add("Credential", $ProvisionCredential)
+        }
+        else {
+            $InvokeParams.Add("Credential", $newCred)
+        }
         
-        invoke-command -ComputerName $ip[1] -FilePath $script -Credential $ProvisionCredential
+        $newCred = invoke-command @InvokeParams
 
         if ($VM.Provisioning.RebootAfterEachScript) {
             Stop-VM -Name $name -ComputerName $HyperVServer.Name -Force
