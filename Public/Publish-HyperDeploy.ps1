@@ -12,12 +12,15 @@ function Publish-HyperDeploy {
 
     .PARAMETER ProvisionCredential
         Credentials object used for authentication when running provision scripts
+    
+    .PARAMETER Destroy
+        Will remove any VM's specified in the definition file
 
     .PARAMETER Replace
         If a VM already exists that matches a VM declared in the JSON definition file replace the existing VM
 
     .PARAMETER Force
-        WARNING - ONLY USE IF YOU FULLY UNDERSTAND THE RAMIFICATIONS, YOU CAN DO A LOT OF DAMAGE WITH THIS. Prevents any additional prompts from being presented such as confirmation prompts. USING THIS WITH CLEAN IS VERY DANGEROUS AND SHOULD BE AVOIDED
+        WARNING - ONLY USE IF YOU FULLY UNDERSTAND THE RAMIFICATIONS, YOU CAN DO A LOT OF DAMAGE WITH THIS. Prevents any additional prompts from being presented such as confirmation prompts. USING THIS WITH DESTROY IS VERY DANGEROUS AND SHOULD BE AVOIDED
 
     .PARAMETER Verbose
         Shows more details regarding execution and exceptions
@@ -31,7 +34,8 @@ function Publish-HyperDeploy {
         [String] $DefinitionFile,
         [Switch] $Replace,
         [Switch] $Force,
-        [PSCredential]$ProvisionCredential
+        [PSCredential]$ProvisionCredential,
+        [Switch] $Destroy
     )
 
     #Requires -RunAsAdministrator
@@ -50,8 +54,12 @@ function Publish-HyperDeploy {
             }
         }
 
+        if (($definition.VMs.Where( { $_.Provisioning }, 'First').Count -gt 0) -and !($ProvisionCredential) -and !$Destroy) {
+            break "Provision Credential must be specified when VM's contain provisioning"
+        }
+
         Test-HyperVServerConnectivity -HyperVServers $definition.HyperVServers
-        Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -ProvisionCredential $ProvisionCredential
+        Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -ProvisionCredential $ProvisionCredential -Destroy $Destroy
         Clear-TempFiles -HyperVServers $definition.HyperVServers 
     }
 

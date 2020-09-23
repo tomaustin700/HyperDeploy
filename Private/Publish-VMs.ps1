@@ -21,6 +21,9 @@ function Confirm-ExistingVMRemovalAndAdd {
             Remove-VM  $VM.Name -ComputerName $existingHypervisor
             Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions -ProvisionCredential $ProvisionCredential
         }
+        else {
+            break
+        }
     }
     elseif ($existingVM -and $Replace -and $Force) {
         Remove-VM  $VM.Name -ComputerName $existingHypervisor
@@ -41,7 +44,8 @@ function Publish-VMs {
         [DeploymentOptions]$DeploymentOptions,
         [bool] $Replace,
         [bool] $Force,
-        [PSCredential]$ProvisionCredential
+        [PSCredential]$ProvisionCredential,
+        [bool] $Destroy
 
     )
 
@@ -65,51 +69,76 @@ function Publish-VMs {
     $Count = 0
     $FilledVMs = @()
 
-    do {
+    if (!$Destroy) {
 
-        foreach ($server in $HyperVServers) {
-            $currentCount = (Get-VM -ComputerName $server.Name | Where-Object { ($VMList | Select-Object -Property Name -ExpandProperty Name) -notcontains $_.Name } ).count
-            $server.MaxVMCount = $server.MaxVMCount - $currentCount
-            $serverCapacity += $server.MaxVMCount
-        }
+        do {
 
-        $VMList.ToArray() | ForEach-Object {
-            $Server = $HyperVServers[$Count % $HyperVAmount]
-            if (($HyperVLists[$Server].Count + 1) -le $Server.MaxVMCount) {
-                $HyperVLists[$Server] += @($_)
-                $VMList.Remove($_)
+            foreach ($server in $HyperVServers) {
+                $currentCount = (Get-VM -ComputerName $server.Name | Where-Object { ($VMList | Select-Object -Property Name -ExpandProperty Name) -notcontains $_.Name } ).count
+                $server.MaxVMCount = $server.MaxVMCount - $currentCount
+                $serverCapacity += $server.MaxVMCount
             }
-            $Count++
-        }
 
-        foreach ($server in $HyperVServers | Where-Object { $FilledVMs -notcontains $_.Name } | Where-Object { $_.MaxVMCount -gt 0 } ) {
-
-            $sName = $server.Name
-            $n = $HyperVLists.Keys | Where-Object { $_.Name -eq $sName } | Select-Object 
-            $c = $HyperVLists[$n]
-            $l = $c.Length
-            $mvmc = $server.MaxVMCount
-
-            if ($mvmc -eq $l) {
-                $FilledVMs += $sName
+            $VMList.ToArray() | ForEach-Object {
+                $Server = $HyperVServers[$Count % $HyperVAmount]
+                if (($HyperVLists[$Server].Count + 1) -le $Server.MaxVMCount) {
+                    $HyperVLists[$Server] += @($_)
+                    $VMList.Remove($_)
+                }
+                $Count++
             }
-        }
 
-        if ($serverCapacity -eq 0 -or ($FilledVMs.Length -eq $HyperVServers.Length -and $VMList.Count -gt 0)) {
-            throw "Not enough Hypervisor capacity for VM's" 
-        }
+            foreach ($server in $HyperVServers | Where-Object { $FilledVMs -notcontains $_.Name } | Where-Object { $_.MaxVMCount -gt 0 } ) {
 
-    }while ($VMList.Count -gt 0) 
+                $sName = $server.Name
+                $n = $HyperVLists.Keys | Where-Object { $_.Name -eq $sName } | Select-Object 
+                $c = $HyperVLists[$n]
+                $l = $c.Length
+                $mvmc = $server.MaxVMCount
+
+                if ($mvmc -eq $l) {
+                    $FilledVMs += $sName
+                }
+            }
+
+            if ($serverCapacity -eq 0 -or ($FilledVMs.Length -eq $HyperVServers.Length -and $VMList.Count -gt 0)) {
+                throw "Not enough Hypervisor capacity for VM's" 
+            }
+
+        }while ($VMList.Count -gt 0) 
 
     
 
-    foreach ($key in $HyperVLists.Keys) {
+        foreach ($key in $HyperVLists.Keys) {
        
-        Write-Host "Adding Virtual Machines" -ForegroundColor Yellow
-        foreach ($vm in $HyperVLists[$key]) {
-            Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force -ProvisionCredential $ProvisionCredential
+            Write-Host "Adding Virtual Machines" -ForegroundColor Yellow
+            foreach ($vm in $HyperVLists[$key]) {
+                Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force -ProvisionCredential $ProvisionCredential
+            }
+            Write-Host "Virtual Machines Added" -ForegroundColor Green
+
         }
-        Write-Host "Virtual Machines Added" -ForegroundColor Green
+    }
+    else {
+        Write-Host "Starting Destroy" -ForegroundColor Red
+        foreach ($vm in $VMList) {
+            $existingVM, $existingHypervisor = Assert-VMAlreadyExists -VM $vm -HyperVServers $HyperVServers
+            if ($existingVM -and !$Force) {
+                $name = $existingVM.Name
+                Write-Host "Remove $name ?" -ForegroundColor Red
+                $RemoveConfirm = Read-Host "Press Y to confirm" 
+                if ($RemoveConfirm.ToLower() -eq "y") {
+                    Remove-VM  $VM.Name -ComputerName $existingHypervisor
+                }
+                else {
+                    break
+                }
+            }
+            elseif ($existingVM -and $Force) {
+                Remove-VM  $VM.Name -ComputerName $existingHypervisor
+            }
+        }
+        Write-Host "Destroy Complete" -ForegroundColor Red
 
     }
     

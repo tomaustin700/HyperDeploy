@@ -12,7 +12,7 @@ function Wait-ForOKHeartbeat {
         Start-Sleep -Seconds 1
         $name = $VM.Name
         #Probs only want to do this when -verbose
-        Write-Host "$name not ready. Waiting"
+        Write-Verbose "$name not ready. Waiting"
 
     }
 
@@ -33,15 +33,15 @@ function Wait-ForResponsiveVM {
         Start-Sleep -Seconds 1
 
         $name = $VM.Name
-        Write-Host "$name has no IP yet. Waiting"
+        Write-Verbose "$name has no IP yet. Waiting"
 
     }
 
     #Get VM IP Address
     $IP = (Get-VMNetworkAdapter -VMName $VM.Name -ComputerName $HyperVServer.Name).IpAddresses[0] 
 
-    write-Host "IP is $IP"
-    Write-Host "Waiting for WinRM"
+    write-Verbose "IP is $IP"
+    Write-Verbose "Waiting for WinRM"
 
     #Wait for WINRM to be responsive
     $failedWSMan = $false
@@ -79,7 +79,7 @@ function Initialize-VM {
    
     $ip = Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
     if ($ip) {
-        Write-Host "WinRM connection established"
+        Write-Verbose "WinRM connection established"
     }
     else {
         break "Timed out waiting for WinRM"

@@ -6,5 +6,5 @@ Import-Module .\HyperDeploy.psm1 -Force
 [pscredential]$credOject = New-Object System.Management.Automation.PSCredential ($userName, $secStringPassword)
 
 
-Publish-HyperDeploy -DefinitionFile "C:\Users\TomA\source\repos\HyperDeploy\Structure1.json"  -Replace -Force -ProvisionCredential $credOject
+Publish-HyperDeploy -DefinitionFile "C:\Users\TomA\source\repos\HyperDeploy\Structure1.json"  -Replace  -ProvisionCredential $credOject 
 
