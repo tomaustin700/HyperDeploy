@@ -5,8 +5,7 @@ function Add-VM {
         [VM]$VM,
         [Parameter(Mandatory)]
         [HyperVServer]$HyperVServer,
-        [DeploymentOptions]$DeploymentOptions,
-        [PSCredential]$ProvisionCredential
+        [DeploymentOptions]$DeploymentOptions
 
     )
     
@@ -115,7 +114,6 @@ function Add-VM {
             $InitializeVMParams = @{ 
                 VM = $VM
                 HyperVServer = $HyperVServer
-                ProvisionCredential = $ProvisionCredential
             }
 
             Initialize-VM @InitializeVMParams  

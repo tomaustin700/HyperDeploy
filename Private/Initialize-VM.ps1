@@ -68,8 +68,7 @@ function Initialize-VM {
         [Parameter(Mandatory)]
         [VM]$VM,
         [Parameter(Mandatory)]
-        [HyperVServer]$HyperVServer,
-        [PSCredential]$ProvisionCredential
+        [HyperVServer]$HyperVServer
 
     )
 
@@ -82,35 +81,52 @@ function Initialize-VM {
         Write-Verbose "WinRM connection established"
     }
     else {
-        break "Timed out waiting for WinRM"
+        throw "Timed out waiting for WinRM"
     }
 
     $newCred = $null
 
     foreach ($script in $VM.Provisioning.Scripts) {
 
-        Write-Host "Provisioning $name using $script" -ForegroundColor Yellow
 
-        $InvokeParams = @{ 
-            FilePath     = $script
-            ComputerName = $ip[1]
-        }
-    
-        if (!$newCred) {
-            $InvokeParams.Add("Credential", $ProvisionCredential)
+        if ($script.EndsWith(".Set-Credential.ps1")) {
+            
+            Write-Verbose "Credential script detected, getting credentials"
+
+            $credObject = invoke-expression -Command $script
+
+            if ($credObject -and $credObject.GetType().Name -eq 'PSCredential') {
+                Write-Verbose "New credentials set" 
+
+                $newCred = $credObject
+            }
         }
         else {
-            $InvokeParams.Add("Credential", $newCred)
-        }
-        
-        $newCred = invoke-command @InvokeParams
 
-        if ($VM.Provisioning.RebootAfterEachScript) {
-            Stop-VM -Name $name -ComputerName $HyperVServer.Name -Force
-            Start-VM -Name $name -ComputerName $HyperVServer.Name
+            Write-Verbose "Provisioning $name using $script" 
+
+            $InvokeParams = @{ 
+                FilePath     = $script
+                ComputerName = $ip[1]
+            }
+           
+            if ($newCred) {
+                $InvokeParams.Add("Credential", $newCred)
+            }
+            
+            $returnObject = invoke-command @InvokeParams
     
-            Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
+           
+    
+            if ($VM.Provisioning.RebootAfterEachScript) {
+                Stop-VM -Name $name -ComputerName $HyperVServer.Name -Force
+                Start-VM -Name $name -ComputerName $HyperVServer.Name
+        
+                Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
+            }
         }
+
+        
 
     }
 

@@ -15,7 +15,7 @@ function Test-DefinitionFile {
     }
 
     if (!$definition){
-        break "Invalid definition file"
+        throw "Invalid definition file"
     }
 
     foreach ($definitionVM in $definition.VMs) {

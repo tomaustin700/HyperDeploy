@@ -10,9 +10,6 @@ function Publish-HyperDeploy {
     .PARAMETER DefinitionFile
         Json file containing the VM definitions.
 
-    .PARAMETER ProvisionCredential
-        Credentials object used for authentication when running provision scripts
-    
     .PARAMETER Destroy
         Will remove any VM's specified in the definition file
 
@@ -34,7 +31,6 @@ function Publish-HyperDeploy {
         [String] $DefinitionFile,
         [Switch] $Replace,
         [Switch] $Force,
-        [PSCredential]$ProvisionCredential,
         [Switch] $Destroy
     )
 
@@ -54,12 +50,8 @@ function Publish-HyperDeploy {
             }
         }
 
-        if (($definition.VMs.Where( { $_.Provisioning }, 'First').Count -gt 0) -and !($ProvisionCredential) -and !$Destroy) {
-            break "Provision Credential must be specified when VM's contain provisioning"
-        }
-
         Test-HyperVServerConnectivity -HyperVServers $definition.HyperVServers
-        Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -ProvisionCredential $ProvisionCredential -Destroy $Destroy
+        Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -Destroy $Destroy
         Clear-TempFiles -HyperVServers $definition.HyperVServers 
     }
 

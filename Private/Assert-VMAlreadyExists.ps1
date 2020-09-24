@@ -22,7 +22,7 @@ function Assert-VMAlreadyExists {
     }
 
     if ($ExistingCount -gt 1){
-        break "Found multiple existing VM's called $Name - not supported"
+        throw "Found multiple existing VM's called $Name - not supported"
     }
   
     return ($ExistingVM, $ExistsOn)

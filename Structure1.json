@@ -22,9 +22,8 @@
             "Provisioning" : {
                 "RebootAfterEachScript": false,
                 "Scripts" : [
-                    "C:\\TestScripts\\Script1.ps1",
-                    "C:\\TestScripts\\Script3.ps1",
-                    "C:\\TestScripts\\Script1.ps1"
+                    "C:\\TestScripts\\Script1.Set-Credential.ps1",
+                    "C:\\TestScripts\\Script3.ps1"
                 ]
             }
 

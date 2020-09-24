@@ -7,8 +7,7 @@ function Confirm-ExistingVMRemovalAndAdd {
         [HyperVServer[]]$HyperVServers,
         [bool] $Replace,
         [bool] $Force,
-        [DeploymentOptions] $DeploymentOptions,
-        [PSCredential]$ProvisionCredential
+        [DeploymentOptions] $DeploymentOptions
 
     )
 
@@ -19,18 +18,18 @@ function Confirm-ExistingVMRemovalAndAdd {
         $ReplaceConfirm = Read-Host "Press Y to confirm" 
         if ($ReplaceConfirm.ToLower() -eq "y") {
             Remove-VM  $VM.Name -ComputerName $existingHypervisor
-            Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions -ProvisionCredential $ProvisionCredential
+            Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions 
         }
         else {
-            break
+            throw
         }
     }
     elseif ($existingVM -and $Replace -and $Force) {
         Remove-VM  $VM.Name -ComputerName $existingHypervisor
-        Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions -ProvisionCredential $ProvisionCredential
+        Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions 
     }
     elseif (!$existingVM) {
-        Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions -ProvisionCredential $ProvisionCredential
+        Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions 
     }
 
 }
@@ -44,7 +43,6 @@ function Publish-VMs {
         [DeploymentOptions]$DeploymentOptions,
         [bool] $Replace,
         [bool] $Force,
-        [PSCredential]$ProvisionCredential,
         [bool] $Destroy
 
     )
@@ -113,7 +111,7 @@ function Publish-VMs {
        
             Write-Host "Adding Virtual Machines" -ForegroundColor Yellow
             foreach ($vm in $HyperVLists[$key]) {
-                Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force -ProvisionCredential $ProvisionCredential
+                Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force 
             }
             Write-Host "Virtual Machines Added" -ForegroundColor Green
 
@@ -131,7 +129,7 @@ function Publish-VMs {
                     Remove-VM  $VM.Name -ComputerName $existingHypervisor
                 }
                 else {
-                    break
+                    throw
                 }
             }
             elseif ($existingVM -and $Force) {
