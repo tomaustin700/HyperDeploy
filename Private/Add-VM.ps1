@@ -44,6 +44,8 @@ function Add-VM {
         } 
         
         if ($VM.GoldenImagePath) {
+            Write-Verbose "Copying golden image"
+
             $path = $VM.GoldenImagePath
 
             Invoke-Command -ComputerName $HyperVServer.Name { 
@@ -63,8 +65,6 @@ function Add-VM {
                         Copy-Item $VM.GoldenImagePath -Destination $tempGI
                     }
                     
-                    Write-Verbose "Copying golden image"
-
                     Copy-Item $tempGI -Destination "$using:diskPath\Disk.vhdx"
                 }
                 else {
@@ -73,8 +73,6 @@ function Add-VM {
                         throw "$localPath does not exist"
                         
                     }
-
-                    Write-Verbose "Copying golden image"
 
                     Copy-Item $localPath -Destination "$using:diskPath\Disk.vhdx"
                 }
@@ -101,6 +99,8 @@ function Add-VM {
     }
 
     if ($DeploymentOptions -and $DeploymentOptions.StartAfterCreation) {
+
+        Write-Verbose "Starting VM"
 
         $StartVMParams = @{ 
             Name         = $VM.Name

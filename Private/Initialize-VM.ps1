@@ -114,9 +114,7 @@ function Initialize-VM {
                 $InvokeParams.Add("Credential", $newCred)
             }
             
-            $returnObject = invoke-command @InvokeParams
-    
-           
+            invoke-command @InvokeParams
     
             if ($VM.Provisioning.RebootAfterEachScript) {
                 Stop-VM -Name $name -ComputerName $HyperVServer.Name -Force
