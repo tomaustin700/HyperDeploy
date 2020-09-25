@@ -74,7 +74,7 @@ function Initialize-VM {
 
     Set-Item wsman:\localhost\Client\TrustedHosts -value * -Force
 
-    $name = $VM.Name
+    $VMName = $VM.Name
    
     $ip = Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
     if ($ip) {
@@ -103,7 +103,7 @@ function Initialize-VM {
         }
         else {
 
-            Write-Verbose "Provisioning $name using $script" 
+            Write-Verbose "Provisioning $VMName using $script" 
 
             $InvokeParams = @{ 
                 FilePath     = $script
