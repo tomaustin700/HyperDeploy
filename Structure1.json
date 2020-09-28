@@ -23,8 +23,7 @@
                 "RebootAfterEachScript": false,
                 "Scripts" : [
                     "C:\\TestScripts\\Script1.Set-Credential.ps1",
-                    "C:\\TestScripts\\Script3.ps1",
-                    "C:\\TestScripts\\Script4.ps1"
+                    "C:\\TestScripts\\Script2.ps1"
                 ]
             }
 

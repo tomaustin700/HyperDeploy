@@ -48,36 +48,46 @@ function Add-VM {
 
             $path = $VM.GoldenImagePath
 
-            Invoke-Command -ComputerName $HyperVServer.Name { 
-                $localPath = $using:path
-                if ($localPath.StartsWith("\\")) {
+            if ($VM.GoldenImagePath.StartsWith("\\")) {
 
-                    $temp = $env:TEMP
-                    $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
+                $uncCreds = invoke-expression -Command $VM.UNCCredentialScript
+
+                if ($uncCreds -and $uncCreds.GetType().Name -eq 'PSCredential') {
+
+                    Invoke-Command -ComputerName $HyperVServer.Name -ScriptBlock { Register-PSSessionConfiguration -Name HyperDeploy -RunAsCredential $using:uncCreds -Force }
+
+                    Invoke-Command  -ConfigurationName HyperDeploy -ComputerName $HyperVServer.Name { 
+                        $localPath = $using:path
     
-                    if (!(Test-Path "filesystem::$localPath")) {
-                        throw "$localPath does not exist"
+                        $temp = $env:TEMP
+                        $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
+        
+                        if (!(Test-Path "filesystem::$localPath")) {
+                            throw "$localPath does not exist"
+                            
+                        }
+        
+                        if (!(Test-Path $tempGI)) {
+                            Write-Verbose "Golden Image Path is UNC, caching locally."
+                            Copy-Item "filesystem::$localPath" -Destination $tempGI
+                        }
                         
-                    }
-    
-                    if (!(Test-Path $tempGI)) {
-                        Write-Verbose "Golden Image Path is UNC, caching locally."
-                        Copy-Item $VM.GoldenImagePath -Destination $tempGI
-                    }
+                        Copy-Item $tempGI -Destination "$using:diskPath\Disk.vhdx"
                     
-                    Copy-Item $tempGI -Destination "$using:diskPath\Disk.vhdx"
+                    }
+                }else{
+                    throw "UNCCredentialScript did not return a valid PSCredential object"
                 }
-                else {
-    
+            }
+            else {
+                Invoke-Command   -ComputerName $HyperVServer.Name { 
                     if (!(Test-Path $localPath)) {
                         throw "$localPath does not exist"
-                        
                     }
 
                     Copy-Item $localPath -Destination "$using:diskPath\Disk.vhdx"
                 }
-
-            } 
+            }
         }
         elseif ($VM.NewVMDiskSizeBytes) {
 
@@ -112,7 +122,7 @@ function Add-VM {
         if ($VM.Provisioning) {
 
             $InitializeVMParams = @{ 
-                VM = $VM
+                VM           = $VM
                 HyperVServer = $HyperVServer
             }
 

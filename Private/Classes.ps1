@@ -23,6 +23,7 @@ class VM:System.ICloneable {
     [int]$ProcessorCount
     [string]$MemoryStartupBytes
     [string]$MemoryMaximumBytes
+    [string]$UNCCredentialScript
     [string]$GoldenImagePath
     [string]$VMHardDiskPath
     [string]$CheckpointType

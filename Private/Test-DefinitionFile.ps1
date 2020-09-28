@@ -33,6 +33,14 @@ function Test-DefinitionFile {
             throw "$name - GoldenImagePath is not a valid UNC path, UNC paths should start with \\"
         }
 
+        if ($definitionVM.GoldenImagePath  -and $definitionVM.GoldenImagePath.StartsWith("\\") -and !$definitionVM.UNCCredentialScript) {
+            throw "$name - UNCCredentialScript is required when GoldenImagePath is a UNC path"
+        }
+
+        if ($definitionVM.GoldenImagePath  -and $definitionVM.GoldenImagePath.StartsWith("\\") -and $definitionVM.UNCCredentialScript -and !$definitionVM.UNCCredentialScript.ToLower().EndsWith("ps1")) {
+            throw "$name - UNCCredentialScript must be a valid ps1 script"
+        }
+
         if (!$definitionVM.VMHardDiskPath -and ($definitionVM.NewVMDiskSizeBytes -Or $definitionVM.GoldenImagePath)) {
             throw "$name - You must specify VMHardDiskPath when setting NewVMDiskSizeBytes or GoldenImagePath"
         }

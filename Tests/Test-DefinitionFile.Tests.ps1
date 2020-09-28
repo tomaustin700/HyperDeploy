@@ -212,5 +212,52 @@ Describe 'Test-DefinitionFile Tests' {
 
   }
 
+  It 'UNCCredentialScriptRequiredWhenGoldenImagePathIsUNC_ShouldThrow' {
+
+    $rootDir = (get-item $PSScriptRoot).Parent.FullName
+    . "$rootDir\Private\Test-DefinitionFile"
+    . "$rootDir\Private\Classes"
+
+
+    $defFile = "{
+        `"VMs`": [
+            {
+                `"Name`": `"Test`",
+                `"GoldenImagePath`": `"\\\\UNC\\Test.vhdx`",
+                `"VMHardDiskPath`" : `"C:\\Test`"
+                
+              
+            }
+        ]
+    }"
+
+    { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - UNCCredentialScript is required when GoldenImagePath is a UNC path"
+
+  }
+
+  It 'UNCCredentialScriptCanOnlyBePS1Script_ShouldThrow' {
+
+    $rootDir = (get-item $PSScriptRoot).Parent.FullName
+    . "$rootDir\Private\Test-DefinitionFile"
+    . "$rootDir\Private\Classes"
+
+
+    $defFile = "{
+        `"VMs`": [
+            {
+                `"Name`": `"Test`",
+                `"GoldenImagePath`": `"\\\\UNC\\Test.vhdx`",
+                `"UNCCredentialScript`": `"Test`",
+                `"VMHardDiskPath`" : `"C:\\Test`"
+                
+              
+            }
+        ]
+    }"
+
+    { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - UNCCredentialScript must be a valid ps1 script"
+
+  }
+
 
 }
