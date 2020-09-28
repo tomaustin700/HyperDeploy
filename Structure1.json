@@ -20,7 +20,7 @@
             "GoldenImagePath" : "C:\\Users\\TomA\\source\\repos\\Agents\\output-hyperv-iso\\Virtual Hard Disks\\automationpacker.vhdx",
             "VMHardDiskPath" : "C:\\VmTest",
             "Provisioning" : {
-                "RebootAfterEachScript": false,
+                "RebootAfterEachScript": true,
                 "Scripts" : [
                     "C:\\TestScripts\\Script1.Set-Credential.ps1",
                     "C:\\TestScripts\\Script2.ps1"

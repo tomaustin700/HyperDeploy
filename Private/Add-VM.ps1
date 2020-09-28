@@ -81,6 +81,7 @@ function Add-VM {
             }
             else {
                 Invoke-Command   -ComputerName $HyperVServer.Name { 
+                    $localPath = $using:path
                     if (!(Test-Path $localPath)) {
                         throw "$localPath does not exist"
                     }
