@@ -50,11 +50,20 @@ function Add-VM {
 
             if ($VM.GoldenImagePath.StartsWith("\\")) {
 
+
                 $uncCreds = invoke-expression -Command $VM.UNCCredentialScript
 
                 if ($uncCreds -and $uncCreds.GetType().Name -eq 'PSCredential') {
 
+                    Write-Verbose "Golden Image UNC Path detected - setting up credentials"
+
                     Invoke-Command -ComputerName $HyperVServer.Name -ScriptBlock { Register-PSSessionConfiguration -Name HyperDeploy -RunAsCredential $using:uncCreds -Force }
+
+                    Write-Verbose "Waiting for WinRM service to be ready"
+
+                    Start-Sleep -Seconds 30
+
+                    Write-Verbose "Copying Golden Image"
 
                     Invoke-Command  -ConfigurationName HyperDeploy -ComputerName $HyperVServer.Name { 
                         $localPath = $using:path
@@ -75,7 +84,8 @@ function Add-VM {
                         Copy-Item $tempGI -Destination "$using:diskPath\Disk.vhdx"
                     
                     }
-                }else{
+                }
+                else {
                     throw "UNCCredentialScript did not return a valid PSCredential object"
                 }
             }

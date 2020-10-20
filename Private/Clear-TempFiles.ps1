@@ -10,6 +10,8 @@ function Clear-TempFiles {
             $temp = $env:TEMP
             $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
 
+            Write-Verbose "Removing $tempGI"
+
             if (Test-Path $tempGI) {
                 Remove-Item $tempGI -Force
             }
@@ -17,13 +19,5 @@ function Clear-TempFiles {
         }
     }
     
-    $temp = $env:TEMP
-    $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
-
-    if (Test-Path $tempGI) {
-        Remove-Item $tempGI -Force
-    }
-        
-
 }
 

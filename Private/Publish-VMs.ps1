@@ -99,7 +99,7 @@ function Publish-VMs {
                 }
             }
 
-            if ($serverCapacity -eq 0 -or ($FilledVMs.Length -eq $HyperVServers.Length -and $VMList.Count -gt 0)) {
+            if ($serverCapacity -le 0 -or ($FilledVMs.Length -eq $HyperVServers.Length -and $VMList.Count -gt 0)) {
                 throw "Not enough Hypervisor capacity for VM's" 
             }
 
