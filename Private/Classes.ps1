@@ -20,6 +20,7 @@ class VM:System.ICloneable {
 
     [string]$Name
     [int]$Replicas
+    [int]$ReplicaStartIndex
     [int]$ProcessorCount
     [string]$MemoryStartupBytes
     [string]$MemoryMaximumBytes

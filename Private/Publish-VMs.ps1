@@ -53,9 +53,14 @@ function Publish-VMs {
         foreach ($replicasRequired in $VMs.Where{ $_.Replicas -gt 0 }) {
             $VMList.Remove($replicasRequired)
 
-            For ($i = 1; $i -le $replicasRequired.Replicas; $i++) {
+            $replicaStartIndex = 1
+            if ($replicasRequired.ReplicaStartIndex -gt 0){
+                $replicaStartIndex = $replicasRequired.ReplicaStartIndex;
+            }
+            
+            For ($replicaStartIndex; $replicaStartIndex -le $replicasRequired.Replicas; $replicaStartIndex++) {
                 $replica = $replicasRequired.Clone()
-                $replica.Name = $replica.Name + $i
+                $replica.Name = $replica.Name + $replicaStartIndex
                 $replica.Replicas = 0
                 $VMList.Add($replica) > $null
             }
