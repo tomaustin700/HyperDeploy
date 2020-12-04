@@ -89,6 +89,27 @@ function Add-VM {
                     throw "UNCCredentialScript did not return a valid PSCredential object"
                 }
             }
+            elseif ($VM.GoldenImagePath.StartsWith("http")) {
+                $temp = $env:TEMP
+                $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
+
+                if ($VM.GoldenImagePath.Contains("drive.google")) {
+                    $p = & { python -V } 2>&1
+
+                    if ($p -is [System.Management.Automation.ErrorRecord]) {
+                        throw "Google Drive file download requires Python and Pip to be installed"
+                    }
+                    else {
+                        pip install gdown
+                        Set-Location $temp
+                        gdrive $VM.GoldenImagePath -O "HyperDeployGoldenImage.vhdx"
+                    }
+
+                }
+                else {
+                    Invoke-WebRequest -Uri $VM.GoldenImagePath -OutFile $tempGI
+                }
+            }
             else {
                 Invoke-Command   -ComputerName $HyperVServer.Name { 
                     $localPath = $using:path
