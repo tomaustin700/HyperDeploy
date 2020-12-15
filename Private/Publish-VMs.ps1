@@ -4,6 +4,7 @@ function Confirm-ExistingVMRemovalAndAdd {
     (
         [Parameter(Mandatory)]
         [VM]$VM,
+        [HyperVServer]$HyperVServer,
         [HyperVServer[]]$HyperVServers,
         [bool] $Replace,
         [bool] $Force,
@@ -18,7 +19,7 @@ function Confirm-ExistingVMRemovalAndAdd {
         $ReplaceConfirm = Read-Host "Press Y to confirm" 
         if ($ReplaceConfirm.ToLower() -eq "y") {
             Remove-VM  $VM.Name -ComputerName $existingHypervisor
-            Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions 
+            Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions 
         }
         else {
             throw
@@ -26,10 +27,10 @@ function Confirm-ExistingVMRemovalAndAdd {
     }
     elseif ($existingVM -and $Replace -and $Force) {
         Remove-VM  $VM.Name -ComputerName $existingHypervisor
-        Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions 
+        Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions 
     }
     elseif (!$existingVM) {
-        Add-VM -VM $VM -HyperVServer $key -DeploymentOptions $DeploymentOptions 
+        Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions 
     }
 
 }
@@ -54,7 +55,7 @@ function Publish-VMs {
             $VMList.Remove($replicasRequired)
 
             $replicaStartIndex = 1
-            if ($replicasRequired.ReplicaStartIndex -gt 0){
+            if ($replicasRequired.ReplicaStartIndex -gt 0) {
                 $replicaStartIndex = $replicasRequired.ReplicaStartIndex;
             }
             
@@ -110,21 +111,80 @@ function Publish-VMs {
 
         }while ($VMList.Count -gt 0) 
 
-    
+
+        Get-Job | Remove-Job -Force
+        $MaxThreads = 5
+
+        $addBlock = {
+
+            Param(
+                [object] $vm,
+                [object] $HyperVServer,
+                [object] $HyperVServers,
+                [object] $DeploymentOptions,
+                [object] $Replace,
+                [object] $Force
+            )
+
+            . .\Private\Publish-VMs.ps1
+            . .\Private\Add-VM.ps1
+            . .\Private\Assert-VMAlreadyExists.ps1
+            . .\Private\Classes.ps1
+            . .\Private\Initialize-VM.ps1
+            . .\Private\Remove-VM.ps1
+
+            Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force 
+        }
 
         foreach ($key in $HyperVLists.Keys) {
        
             Write-Host "Adding Virtual Machines" -ForegroundColor Yellow
+
             foreach ($vm in $HyperVLists[$key]) {
-                Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force 
+
+                While ($(Get-Job -state running).count -ge $MaxThreads) {
+                    Start-Sleep -Milliseconds 3
+                }
+                Start-Job -Scriptblock $addBlock -ArgumentList $vm, $key, $HyperVServers, $DeploymentOptions, $Replace, $Force
             }
+
+            While ($(Get-Job -State Running).count -gt 0) {
+                start-sleep 1
+            }
+
+            #Get information from each job.
+            foreach ($job in Get-Job) {
+                $info = Receive-Job -Id ($job.Id)
+            }
+            
+            #Remove all jobs created.
+            Get-Job | Remove-Job
+
             Write-Host "Virtual Machines Added" -ForegroundColor Green
 
         }
     }
     else {
         Write-Host "Starting Destroy" -ForegroundColor Red
-        foreach ($vm in $VMList) {
+
+        Get-Job | Remove-Job -Force
+        $MaxThreads = 20
+
+        $destroyBlock = {
+
+            Param(
+                [object] $vm,
+                [object] $HyperVServers,
+                [object] $Force
+            )
+
+            . .\Private\Publish-VMs.ps1
+            . .\Private\Add-VM.ps1
+            . .\Private\Assert-VMAlreadyExists.ps1
+            . .\Private\Classes.ps1
+            . .\Private\Initialize-VM.ps1
+            . .\Private\Remove-VM.ps1
+
             $existingVM, $existingHypervisor = Assert-VMAlreadyExists -VM $vm -HyperVServers $HyperVServers
             if ($existingVM -and !$Force) {
                 $name = $existingVM.Name
@@ -141,6 +201,27 @@ function Publish-VMs {
                 Remove-VM  $VM.Name -ComputerName $existingHypervisor
             }
         }
+
+        foreach ($vm in $VMList) {
+
+            While ($(Get-Job -state running).count -ge $MaxThreads) {
+                Start-Sleep -Milliseconds 3
+            }
+            Start-Job -Scriptblock $destroyBlock -ArgumentList $vm, $HyperVServers, $Force
+        }
+
+        While ($(Get-Job -State Running).count -gt 0) {
+            start-sleep 1
+        }
+
+        #Get information from each job.
+        foreach ($job in Get-Job) {
+            $info = Receive-Job -Id ($job.Id)
+        }
+        
+        #Remove all jobs created.
+        Get-Job | Remove-Job
+
         Write-Host "Destroy Complete" -ForegroundColor Red
 
     }
