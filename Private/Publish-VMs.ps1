@@ -26,7 +26,8 @@ function Confirm-ExistingVMRemovalAndAdd {
         }
     }
     elseif ($existingVM -and $Replace -and $Force) {
-        Remove-VM  $VM.Name -ComputerName $existingHypervisor
+        Write-Verbose "Existing VM found, replacing."
+        Remove-VM $VM.Name -ComputerName $existingHypervisor
         Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions 
     }
     elseif (!$existingVM) {
@@ -118,7 +119,8 @@ function Publish-VMs {
         $addBlock = {
 
             Param(
-                [object] $vm,
+                [object] $VM,
+                [object] $Provisioning,
                 [object] $HyperVServer,
                 [object] $HyperVServers,
                 [object] $DeploymentOptions,
@@ -133,7 +135,9 @@ function Publish-VMs {
             . .\Private\Initialize-VM.ps1
             . .\Private\Remove-VM.ps1
 
-            Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force 
+            $VM.Provisioning = $Provisioning
+
+            Confirm-ExistingVMRemovalAndAdd -VM $VM -HyperVServers $HyperVServers -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force 
         }
 
         foreach ($key in $HyperVLists.Keys) {
@@ -145,7 +149,7 @@ function Publish-VMs {
                 While ($(Get-Job -state running).count -ge $MaxThreads) {
                     Start-Sleep -Milliseconds 3
                 }
-                Start-Job -Scriptblock $addBlock -ArgumentList $vm, $key, $HyperVServers, $DeploymentOptions, $Replace, $Force
+                Start-Job -Scriptblock $addBlock -ArgumentList $vm, $vm.Provisioning, $key, $HyperVServers, $DeploymentOptions, $Replace, $Force
             }
 
             While ($(Get-Job -State Running).count -gt 0) {
