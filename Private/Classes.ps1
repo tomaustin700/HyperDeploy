@@ -35,6 +35,7 @@ class VM:System.ICloneable {
 
 class DeploymentOptions {
     [bool]$StartAfterCreation
+    [bool]$Parallel
 }
 
 class Definition {
