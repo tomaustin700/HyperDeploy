@@ -13,10 +13,11 @@ function Assert-VMAlreadyExists {
     $Name = $VM.Name
 
     foreach ($hyperVServer in $HyperVServers) {
-        $ExistingVM = Get-VM -ComputerName $hyperVServer.Name -name $VM.Name -ErrorAction SilentlyContinue  
-        if ($ExistingVM) {
+        $foundVM = Get-VM -ComputerName $hyperVServer.Name -name $VM.Name -ErrorAction SilentlyContinue  
+        if ($foundVM) {
             $ExistingCount++
             $ExistsOn = $hyperVServer.Name
+            $ExistingVM = $foundVM
             
         }
     }
