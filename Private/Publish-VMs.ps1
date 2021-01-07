@@ -139,10 +139,10 @@ function Publish-VMs {
 
             Confirm-ExistingVMRemovalAndAdd -VM $VM -HyperVServers $HyperVServers -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $true 
         }
+        Write-Host "Adding Virtual Machines" -ForegroundColor Yellow
 
         foreach ($key in $HyperVLists.Keys) {
        
-            Write-Host "Adding Virtual Machines" -ForegroundColor Yellow
 
             foreach ($vm in $HyperVLists[$key]) {
 
@@ -170,10 +170,9 @@ function Publish-VMs {
                 #Remove all jobs created.
                 Get-Job | Remove-Job
             }
-
-            Write-Host "Virtual Machines Added" -ForegroundColor Green
-
         }
+        Write-Host "Virtual Machines Added" -ForegroundColor Green
+
     }
     else {
         Write-Host "Starting Destroy" -ForegroundColor Red
