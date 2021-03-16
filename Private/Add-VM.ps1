@@ -24,6 +24,7 @@ function Add-VM {
         ProcessorCount     = $VM.ProcessorCount
         MemoryMaximumBytes = [int64][scriptblock]::Create($VM.MemoryMaximumBytes).Invoke()[0]  
         ComputerName       = $HyperVServer.Name
+        DynamicMemory = $true
     }
 
     if ($VM.CheckpointType) {

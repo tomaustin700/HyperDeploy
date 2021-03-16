@@ -1,42 +1,19 @@
 {
     "DeploymentOptions": {
-        "StartAfterCreation": true
+        "StartAfterCreation": false
     },
-    "HyperVServers": [
-        {
-            "Name": "TestServer",
-            "MaxVMCount": 10
-        },
-        {
-            "Name": "TestServer1",
-            "MaxVMCount": 5
-        },
-        {
-            "Name": "TestServer2",
-            "MaxVMCount": 2
-        }
-    ],
     "VMs": [
         {
             "Name": "TestVM",
-            "Replicas": 16,
+            "ReplicaStartIndex" : 5,
+            "Replicas": 2,
             "ProcessorCount": 1,
             "MemoryStartupBytes": "1GB",
             "MemoryMaximumBytes": "4GB",
             "GoldenImagePath": "",
             "VMHardDiskPath": "",
             "CheckpointType": "Disabled",
-            "SwitchName": "Switch"
-        },
-        {
-            "Name": "Test",
-            "ProcessorCount": 1,
-            "MemoryStartupBytes": "1GB",
-            "MemoryMaximumBytes": "4GB",
-            "GoldenImagePath": "",
-            "VMHardDiskPath": "",
-            "CheckpointType": "Disabled",
-            "SwitchName": "Switch"
+            "SwitchName": "packer-hyperv-iso"
         }
     ]
 }

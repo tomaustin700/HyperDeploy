@@ -58,6 +58,7 @@ function Publish-VMs {
             $replicaStartIndex = 1
             if ($replicasRequired.ReplicaStartIndex -gt 0) {
                 $replicaStartIndex = $replicasRequired.ReplicaStartIndex;
+                $replicasRequired.Replicas = $replicasRequired.Replicas + $replicaStartIndex - 1
             }
             
             For ($replicaStartIndex; $replicaStartIndex -le $replicasRequired.Replicas; $replicaStartIndex++) {
