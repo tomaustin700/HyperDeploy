@@ -11,8 +11,12 @@ Describe 'Test-DefinitionFile Tests' {
         `"VMs`": [
             {
                 `"Name`": `"Test`",
-                `"GoldenImagePath`": `"C:\\Test.vhdx`",
-                `"NewVMDiskSizeBytes`": `"1GB`"
+                `"NewVMDiskSizeBytes`": `"1GB`",
+                `"HyperVServers`": [
+                  {
+                      `"GoldenImagePath`": `"C:\\Test.vhdx`",
+                  }
+              ]
             }
         ]
     }"
@@ -32,8 +36,12 @@ Describe 'Test-DefinitionFile Tests' {
         `"VMs`": [
             {
                 `"Name`": `"Test`",
-                `"VMHardDiskPath`" : `"C:\\Test`",
-                `"GoldenImagePath`": `"C:\\Test.vhx`"
+                `"HyperVServers`": [
+                  {
+                      `"GoldenImagePath`": `"C:\\Test`",
+                      `"VMHardDiskPath`" : `"C:\\Test`"
+                  }
+              ]
             }
         ]
     }"
@@ -53,8 +61,13 @@ Describe 'Test-DefinitionFile Tests' {
         `"VMs`": [
             {
                 `"Name`": `"Test`",
-                `"VMHardDiskPath`" : `"C:\\Test`",
-                `"GoldenImagePath`": `"filesystem:\\server\\c$\\Test.vhdx`"
+                `"HyperVServers`": [
+                  {
+                      `"GoldenImagePath`": `"filesystem:\\server\\c$\\Test.vhdx`",
+                      `"VMHardDiskPath`" : `"C:\\Test`"
+                  }
+              ]
+                
             }
         ]
     }"
@@ -74,7 +87,12 @@ Describe 'Test-DefinitionFile Tests' {
         `"VMs`": [
             {
                 `"Name`": `"Test`",
-                `"NewVMDiskSizeBytes`": `"1GB`"
+                `"NewVMDiskSizeBytes`": `"1GB`",
+                `"HyperVServers`": [
+                  {
+                      
+                  }
+              ]
             }
         ]
     }"
@@ -94,7 +112,11 @@ Describe 'Test-DefinitionFile Tests' {
         `"VMs`": [
             {
                 `"Name`": `"Test`",
-                `"GoldenImagePath`": `"C:\\Test.vhdx`"
+                `"HyperVServers`": [
+                  {
+                      `"GoldenImagePath`": `"C:\\Test.vhdx`",
+                  }
+              ]
             }
         ]
     }"
@@ -114,7 +136,11 @@ Describe 'Test-DefinitionFile Tests' {
         `"VMs`": [
             {
                 `"Name`": `"Test`",
-                `"SwitchName`" : `"Test`",
+                `"HyperVServers`": [
+                  {
+                      `"SwitchName`": `"Test`",
+                  }
+                  ],
                 `"Provisioning`" : {
                   `"Scripts`": [
                       `"C:\\Test.ps1`"
@@ -139,8 +165,13 @@ Describe 'Test-DefinitionFile Tests' {
         `"VMs`": [
             {
                 `"Name`": `"Test`",
-                `"GoldenImagePath`": `"C:\\Test.vhdx`",
-                `"VMHardDiskPath`" : `"C:\\Test`",
+                `"HyperVServers`": [
+                  {
+                      `"GoldenImagePath`": `"C:\\Test.vhdx`",
+                      `"VMHardDiskPath`" : `"C:\\Test`"
+                  }
+              ],
+                
                 `"Provisioning`" : {
                   `"Scripts`": [
                       `"C:\\Test.ps1`"
@@ -167,9 +198,13 @@ Describe 'Test-DefinitionFile Tests' {
       `"VMs`": [
           {
               `"Name`": `"Test`",
-              `"GoldenImagePath`": `"C:\\Test.vhdx`",
-              `"SwitchName`" : `"Test`",
-              `"VMHardDiskPath`" : `"C:\\Test`",
+              `"HyperVServers`": [
+                {
+                    `"GoldenImagePath`": `"C:\\Test.vhdx`",
+                    `"VMHardDiskPath`" : `"C:\\Test`",
+                    `"SwitchName`" : `"Test`"
+                }
+            ],
               `"Provisioning`" : {
                 `"Scripts`": [
                     `"C:\\Test.ps1`"
@@ -196,9 +231,13 @@ Describe 'Test-DefinitionFile Tests' {
       `"VMs`": [
           {
               `"Name`": `"Test`",
-              `"GoldenImagePath`": `"C:\\Test.vhdx`",
-              `"SwitchName`" : `"Test`",
-              `"VMHardDiskPath`" : `"C:\\Test`",
+              `"HyperVServers`": [
+                {
+                    `"GoldenImagePath`": `"C:\\Test.vhdx`",
+                    `"VMHardDiskPath`" : `"C:\\Test`",
+                    `"SwitchName`" : `"Test`"
+                }
+            ],
               `"Provisioning`" : {
                 `"Scripts`": [
                     `"C:\\Test.exe`"
@@ -223,8 +262,12 @@ Describe 'Test-DefinitionFile Tests' {
         `"VMs`": [
             {
                 `"Name`": `"Test`",
-                `"GoldenImagePath`": `"\\\\UNC\\Test.vhdx`",
-                `"VMHardDiskPath`" : `"C:\\Test`"
+                `"HyperVServers`": [
+                  {
+                      `"GoldenImagePath`": `"\\\\UNC\\Test.vhdx`",
+                      `"VMHardDiskPath`" : `"C:\\Test`"
+                  }
+              ],
                 
               
             }
@@ -246,9 +289,13 @@ Describe 'Test-DefinitionFile Tests' {
         `"VMs`": [
             {
                 `"Name`": `"Test`",
-                `"GoldenImagePath`": `"\\\\UNC\\Test.vhdx`",
-                `"UNCCredentialScript`": `"Test`",
-                `"VMHardDiskPath`" : `"C:\\Test`"
+                `"HyperVServers`": [
+                  {
+                      `"GoldenImagePath`": `"\\\\UNC\\Test.vhdx`",
+                      `"VMHardDiskPath`" : `"C:\\Test`"
+                  }
+              ],
+                `"UNCCredentialScript`": `"Test`"
                 
               
             }
