@@ -1,6 +1,9 @@
 class HyperVServer {
     [string]$Name
-    [System.Nullable[int]]$MaxVMCount
+    [System.Nullable[int]]$MaxReplicas
+    [string]$SwitchName
+    [string]$GoldenImagePath
+    [string]$VMHardDiskPath
 }
 
 class Provisioning {
@@ -25,12 +28,11 @@ class VM:System.ICloneable {
     [string]$MemoryStartupBytes
     [string]$MemoryMaximumBytes
     [string]$UNCCredentialScript
-    [string]$GoldenImagePath
-    [string]$VMHardDiskPath
     [string]$CheckpointType
-    [string]$SwitchName
     [string]$NewVMDiskSizeBytes
     [Provisioning]$Provisioning
+    [HyperVServer[]]$HyperVServers
+    [guid]$ReplicaGuid
 }
 
 class DeploymentOptions {
@@ -40,6 +42,5 @@ class DeploymentOptions {
 
 class Definition {
     [DeploymentOptions]$DeploymentOptions
-    [HyperVServer[]]$HyperVServers
     [VM[]]$VMs
 }

@@ -52,64 +52,124 @@ function Publish-VMs {
     [System.Collections.ArrayList]$VMList = $VMs
     if ($VMs.Where( { $_.Replicas -gt 0 }, 'First').Count -gt 0) {
         #Replicas Detected
+        
         foreach ($replicasRequired in $VMs.Where{ $_.Replicas -gt 0 }) {
             $VMList.Remove($replicasRequired)
+            $startReplicas = $replicasRequired.Replicas
 
             $replicaStartIndex = 1
             if ($replicasRequired.ReplicaStartIndex -gt 0) {
                 $replicaStartIndex = $replicasRequired.ReplicaStartIndex;
                 $replicasRequired.Replicas = $replicasRequired.Replicas + $replicaStartIndex - 1
             }
+
+
+            foreach ($server in $replicasRequired.HyperVServers) {
+                if ($server.MaxReplicas) {
+                    $crossServerMaxReplicas += $server.MaxReplicas
+                }
+            }
+
+            if ($startReplicas -gt $crossServerMaxReplicas) {
+                throw "Not enough Hypervisor capacity for VM's" 
+            }
+
+            $hyperVIndex = 0;
+            $guid = [guid]::NewGuid()
             
             For ($replicaStartIndex; $replicaStartIndex -le $replicasRequired.Replicas; $replicaStartIndex++) {
                 $replica = $replicasRequired.Clone()
                 $replica.Name = $replica.Name + $replicaStartIndex
                 $replica.Replicas = 0
+                $replica.ReplicaGuid = $guid
+                $orginalServers = $replica.HyperVServers
+
+                $allocatedServer = $replica.HyperVServers[$hyperVIndex]
+                $replica.HyperVServers = @()
+                if ($allocatedServer.MaxReplicas) {
+                    #Do logic to calculate how many replicas already allocated to hypervisor, if assigning this one would breach then increment hypervindex
+                    do {
+                        $allocated = $false
+                        $allocatedServer = $orginalServers[$hyperVIndex]
+
+                        $reps = $VMList | Where-Object { $_.ReplicaGuid -eq $guid -and $_.HyperVServers[0].Name -eq $allocatedServer.Name }
+
+                        if ($reps.Count -eq $allocatedServer.MaxReplicas) {
+                            #Pick new server as allocated one at max
+
+                            if ($hyperVIndex + 1 -eq $orginalServers.Length) {
+                                $hyperVIndex = 0;
+                            }
+                            else {
+                                $hyperVIndex++;
+                            }
+                        }
+                        else {
+                            $replica.HyperVServers += $allocatedServer
+                            $allocated = $true
+                        }
+                    }
+                    While (!$allocated)
+
+                }
+                else {
+                    $replica.HyperVServers += $allocatedServer
+                }
+
+                if ($hyperVIndex + 1 -eq $orginalServers.Length) {
+                    $hyperVIndex = 0;
+                }
+                else {
+                    $hyperVIndex++;
+                }
+                
                 $VMList.Add($replica) > $null
             }
         }
     }
 
-    $HyperVAmount = $HyperVServers.Count
+    # $HyperVAmount = $HyperVServers.Count
     $HyperVLists = @{}
-    $Count = 0
-    $FilledVMs = @()
+    # $Count = 0
+    # $FilledVMs = @()
 
     if (!$Destroy) {
 
         do {
+            
+            
 
-            foreach ($server in $HyperVServers) {
-                $currentCount = (Get-VM -ComputerName $server.Name | Where-Object { ($VMList | Select-Object -Property Name -ExpandProperty Name) -notcontains $_.Name } ).count
-                $server.MaxVMCount = $server.MaxVMCount - $currentCount
-                $serverCapacity += $server.MaxVMCount
-            }
+            # foreach ($server in $HyperVServers) {
+            #     $currentCount = (Get-VM -ComputerName $server.Name | Where-Object { ($VMList | Select-Object -Property Name -ExpandProperty Name) -notcontains $_.Name } ).count
+            #     $server.MaxVMCount = $server.MaxVMCount - $currentCount
+            #     $serverCapacity += $server.MaxVMCount
+            # }
 
-            $VMList.ToArray() | ForEach-Object {
-                $Server = $HyperVServers[$Count % $HyperVAmount]
-                if (($HyperVLists[$Server].Count + 1) -le $Server.MaxVMCount) {
-                    $HyperVLists[$Server] += @($_)
-                    $VMList.Remove($_)
-                }
-                $Count++
-            }
+            # $VMList.ToArray() | ForEach-Object {
+            #     $Server = $HyperVServers[$Count % $HyperVAmount]
+            #     if (($HyperVLists[$Server].Count + 1) -le $Server.MaxVMCount) {
+            #         $HyperVLists[$Server] += @($_)
+            #         $VMList.Remove($_)
+            #     }
+            #     $Count++
+            # }
 
-            foreach ($server in $HyperVServers | Where-Object { $FilledVMs -notcontains $_.Name } | Where-Object { $_.MaxVMCount -gt 0 } ) {
+            # foreach ($server in $HyperVServers | Where-Object { $FilledVMs -notcontains $_.Name } | Where-Object { $_.MaxVMCount -gt 0 } ) {
 
-                $sName = $server.Name
-                $n = $HyperVLists.Keys | Where-Object { $_.Name -eq $sName } | Select-Object 
-                $c = $HyperVLists[$n]
-                $l = $c.Length
-                $mvmc = $server.MaxVMCount
+            #     $sName = $server.Name
+            #     $n = $HyperVLists.Keys | Where-Object { $_.Name -eq $sName } | Select-Object 
+            #     $c = $HyperVLists[$n]
+            #     $l = $c.Length
+            #     $mvmc = $server.MaxVMCount
 
-                if ($mvmc -eq $l) {
-                    $FilledVMs += $sName
-                }
-            }
+            #     if ($mvmc -eq $l) {
+            #         $FilledVMs += $sName
+            #     }
+            # }
 
-            if ($serverCapacity -le 0 -or ($FilledVMs.Length -eq $HyperVServers.Length -and $VMList.Count -gt 0)) {
-                throw "Not enough Hypervisor capacity for VM's" 
-            }
+            # if ($serverCapacity -le 0 -or ($FilledVMs.Length -eq $HyperVServers.Length -and $VMList.Count -gt 0)) {
+            #     throw "Not enough Hypervisor capacity for VM's" 
+            # }
 
         }while ($VMList.Count -gt 0) 
 
