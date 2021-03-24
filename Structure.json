@@ -6,20 +6,13 @@
         {
             "Name": "TestVM",
             "ReplicaStartIndex": 5,
-            "Replicas": 10,
+            "Replicas": 3,
             "ProcessorCount": 1,
             "MemoryStartupBytes": "1GB",
             "MemoryMaximumBytes": "4GB",
             "CheckpointType": "Disabled",
             "HyperVServers": [
                 {
-                    "SwitchName": "packer-hyperv-iso",
-                    "GoldenImagePath": "",
-                    "VMHardDiskPath": "",
-                    "MaxReplicas" : 2
-                },
-                {
-                    "Name" : "Testripper",
                     "SwitchName": "packer-hyperv-iso",
                     "GoldenImagePath": "",
                     "VMHardDiskPath": ""

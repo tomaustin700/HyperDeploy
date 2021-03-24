@@ -57,8 +57,8 @@ function Publish-HyperDeploy {
         }
 
         Test-HyperVServerConnectivity -HyperVServers ($servers | Get-Unique)
-        Publish-VMs -HyperVServers $definition.HyperVServers -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -Destroy $Destroy
-        Clear-TempFiles -HyperVServers $definition.HyperVServers 
+        Publish-VMs -HyperVServers ($servers | Get-Unique) -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -Destroy $Destroy
+        Clear-TempFiles -HyperVServers ($servers | Get-Unique)
     }
 
 }

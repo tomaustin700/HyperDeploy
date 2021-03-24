@@ -15,8 +15,8 @@ function Add-VM {
         ComputerName       = $HyperVServer.Name
     }
 
-    if ($VM.SwitchName) {
-        $NewVMParams.Add("SwitchName", $VM.SwitchName)
+    if ($HyperVServer.SwitchName) {
+        $NewVMParams.Add("SwitchName", $HyperVServer.SwitchName)
     }
 
     $SetVMParams = @{ 
@@ -34,9 +34,9 @@ function Add-VM {
     New-VM  @NewVMParams | out-null
     Set-VM @SetVMParams
 
-    if ($VM.VMHardDiskPath) {
+    if ($HyperVServer.VMHardDiskPath) {
 
-        $diskPath = $VM.VMHardDiskPath + "\" + $VM.Name
+        $diskPath = $HyperVServer.VMHardDiskPath + "\" + $VM.Name
 
         Invoke-Command -ComputerName $HyperVServer.Name { 
             if (!(Test-Path -Path $using:diskPath)) {
@@ -44,12 +44,12 @@ function Add-VM {
             }
         } 
         
-        if ($VM.GoldenImagePath) {
+        if ($HyperVServer.GoldenImagePath) {
             Write-Verbose "Copying golden image"
 
-            $path = $VM.GoldenImagePath
+            $path = $HyperVServer.GoldenImagePath
 
-            if ($VM.GoldenImagePath.StartsWith("\\")) {
+            if ($HyperVServer.GoldenImagePath.StartsWith("\\")) {
 
 
                 $uncCreds = invoke-expression -Command $VM.UNCCredentialScript
@@ -90,11 +90,11 @@ function Add-VM {
                     throw "UNCCredentialScript did not return a valid PSCredential object"
                 }
             }
-            elseif ($VM.GoldenImagePath.StartsWith("http")) {
+            elseif ($HyperVServer.GoldenImagePath.StartsWith("http")) {
                 $temp = $env:TEMP
                 $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
 
-                if ($VM.GoldenImagePath.Contains("drive.google")) {
+                if ($HyperVServer.GoldenImagePath.Contains("drive.google")) {
                     $p = & { python -V } 2>&1
 
                     if ($p -is [System.Management.Automation.ErrorRecord]) {
@@ -103,12 +103,12 @@ function Add-VM {
                     else {
                         pip install gdown
                         Set-Location $temp
-                        gdrive $VM.GoldenImagePath -O "HyperDeployGoldenImage.vhdx"
+                        gdrive $HyperVServer.GoldenImagePath -O "HyperDeployGoldenImage.vhdx"
                     }
 
                 }
                 else {
-                    Invoke-WebRequest -Uri $VM.GoldenImagePath -OutFile $tempGI
+                    Invoke-WebRequest -Uri $HyperVServer.GoldenImagePath -OutFile $tempGI
                 }
             }
             else {

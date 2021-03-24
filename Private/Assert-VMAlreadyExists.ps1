@@ -4,7 +4,7 @@ function Assert-VMAlreadyExists {
     (
         [Parameter(Mandatory)]
         [VM]$VM,
-        [HyperVServer[]]$HyperVServers
+        [string[]]$HyperVServers
     )
 
     $ExistingVM = $null
@@ -13,10 +13,10 @@ function Assert-VMAlreadyExists {
     $Name = $VM.Name
 
     foreach ($hyperVServer in $HyperVServers) {
-        $foundVM = Get-VM -ComputerName $hyperVServer.Name -name $VM.Name -ErrorAction SilentlyContinue  
+        $foundVM = Get-VM -ComputerName $hyperVServer -name $VM.Name -ErrorAction SilentlyContinue  
         if ($foundVM) {
             $ExistingCount++
-            $ExistsOn = $hyperVServer.Name
+            $ExistsOn = $hyperVServer
             $ExistingVM = $foundVM
             
         }

@@ -5,7 +5,7 @@ function Confirm-ExistingVMRemovalAndAdd {
         [Parameter(Mandatory)]
         [VM]$VM,
         [HyperVServer]$HyperVServer,
-        [HyperVServer[]]$HyperVServers,
+        [string[]]$HyperVServers,
         [bool] $Replace,
         [bool] $Force,
         [DeploymentOptions] $DeploymentOptions
@@ -41,7 +41,7 @@ function Publish-VMs {
     (
         [Parameter(Mandatory)]
         [VM[]]$VMs,
-        [HyperVServer[]]$HyperVServers,
+        [string[]]$HyperVServers,
         [DeploymentOptions]$DeploymentOptions,
         [bool] $Replace,
         [bool] $Force,
@@ -128,50 +128,7 @@ function Publish-VMs {
         }
     }
 
-    # $HyperVAmount = $HyperVServers.Count
-    $HyperVLists = @{}
-    # $Count = 0
-    # $FilledVMs = @()
-
     if (!$Destroy) {
-
-        do {
-            
-            
-
-            # foreach ($server in $HyperVServers) {
-            #     $currentCount = (Get-VM -ComputerName $server.Name | Where-Object { ($VMList | Select-Object -Property Name -ExpandProperty Name) -notcontains $_.Name } ).count
-            #     $server.MaxVMCount = $server.MaxVMCount - $currentCount
-            #     $serverCapacity += $server.MaxVMCount
-            # }
-
-            # $VMList.ToArray() | ForEach-Object {
-            #     $Server = $HyperVServers[$Count % $HyperVAmount]
-            #     if (($HyperVLists[$Server].Count + 1) -le $Server.MaxVMCount) {
-            #         $HyperVLists[$Server] += @($_)
-            #         $VMList.Remove($_)
-            #     }
-            #     $Count++
-            # }
-
-            # foreach ($server in $HyperVServers | Where-Object { $FilledVMs -notcontains $_.Name } | Where-Object { $_.MaxVMCount -gt 0 } ) {
-
-            #     $sName = $server.Name
-            #     $n = $HyperVLists.Keys | Where-Object { $_.Name -eq $sName } | Select-Object 
-            #     $c = $HyperVLists[$n]
-            #     $l = $c.Length
-            #     $mvmc = $server.MaxVMCount
-
-            #     if ($mvmc -eq $l) {
-            #         $FilledVMs += $sName
-            #     }
-            # }
-
-            # if ($serverCapacity -le 0 -or ($FilledVMs.Length -eq $HyperVServers.Length -and $VMList.Count -gt 0)) {
-            #     throw "Not enough Hypervisor capacity for VM's" 
-            # }
-
-        }while ($VMList.Count -gt 0) 
 
         if ($DeploymentOptions.Parallel) {
             Get-Job | Remove-Job -Force
@@ -198,40 +155,37 @@ function Publish-VMs {
 
             $VM.Provisioning = $Provisioning
 
-            Confirm-ExistingVMRemovalAndAdd -VM $VM -HyperVServers $HyperVServers -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $true 
+            Confirm-ExistingVMRemovalAndAdd -VM $VM -HyperVServers $HyperVServers -HyperVServer $vm.HyperVServers[0] -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $true 
         }
         Write-Host "Adding Virtual Machines" -ForegroundColor Yellow
 
-        foreach ($key in $HyperVLists.Keys) {
-       
 
-            foreach ($vm in $HyperVLists[$key]) {
-
-                if ($DeploymentOptions.Parallel) {
-                    While ($(Get-Job -state running).count -ge $MaxThreads) {
-                        Start-Sleep -Milliseconds 3
-                    }
-                    Start-Job -Scriptblock $addBlock -ArgumentList $vm, $vm.Provisioning, $key, $HyperVServers, $DeploymentOptions, $Replace
-                }
-                else {
-                    Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force 
-                }
-            }
-
+        foreach ($vm in $VMList) {
             if ($DeploymentOptions.Parallel) {
-                While ($(Get-Job -State Running).count -gt 0) {
-                    start-sleep 1
+                While ($(Get-Job -state running).count -ge $MaxThreads) {
+                    Start-Sleep -Milliseconds 3
                 }
-
-                #Get information from each job.
-                foreach ($job in Get-Job) {
-                    $info = Receive-Job -Id ($job.Id)
-                }
-            
-                #Remove all jobs created.
-                Get-Job | Remove-Job
+                Start-Job -Scriptblock $addBlock -ArgumentList $vm, $vm.Provisioning, $key, $HyperVServers, $DeploymentOptions, $Replace
+            }
+            else {
+                Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -HyperVServer $vm.HyperVServers[0] -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force 
             }
         }
+
+        if ($DeploymentOptions.Parallel) {
+            While ($(Get-Job -State Running).count -gt 0) {
+                start-sleep 1
+            }
+    
+            #Get information from each job.
+            foreach ($job in Get-Job) {
+                $info = Receive-Job -Id ($job.Id)
+            }
+                
+            #Remove all jobs created.
+            Get-Job | Remove-Job
+        }
+
         Write-Host "Virtual Machines Added" -ForegroundColor Green
 
     }

@@ -1,11 +1,11 @@
 function Clear-TempFiles {
     Param
     (
-        [HyperVServer[]]$HyperVServers
+        [string[]]$HyperVServers
     )
 
     foreach ($server in $HyperVServers) {
-        Invoke-Command -ComputerName $server.Name {
+        Invoke-Command -ComputerName $server {
 
             $temp = $env:TEMP
             $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
