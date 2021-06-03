@@ -129,7 +129,7 @@ function Publish-VMs {
             }
 
             if ($replicasRequired.SkipNames.Length -gt 0) {
-                Write-Host "Skips detected"
+                Write-Verbose "Skips detected"
                 foreach ($skip in $replicasRequired.SkipNames) {
                     $vms = $VMList
                     foreach ($vm in $vms) {
@@ -149,6 +149,8 @@ function Publish-VMs {
             }
         }
     }
+
+    write-output $VMList
 
     if (!$Destroy) {
 
