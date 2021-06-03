@@ -52,8 +52,11 @@ function Publish-VMs {
     [System.Collections.ArrayList]$VMList = $VMs
     if ($VMs.Where( { $_.Replicas -gt 0 }, 'First').Count -gt 0) {
         #Replicas Detected
-        
+
         foreach ($replicasRequired in $VMs.Where{ $_.Replicas -gt 0 }) {
+
+            
+
             $VMList.Remove($replicasRequired)
             $startReplicas = $replicasRequired.Replicas
 
@@ -62,7 +65,6 @@ function Publish-VMs {
                 $replicaStartIndex = $replicasRequired.ReplicaStartIndex;
                 $replicasRequired.Replicas = $replicasRequired.Replicas + $replicaStartIndex - 1
             }
-
 
             foreach ($server in $replicasRequired.HyperVServers) {
                 if ($server.MaxReplicas) {
@@ -124,6 +126,26 @@ function Publish-VMs {
                 }
                 
                 $VMList.Add($replica) > $null
+            }
+
+            if ($replicasRequired.SkipNames.Length -gt 0) {
+                Write-Host "Skips detected"
+                foreach ($skip in $replicasRequired.SkipNames) {
+                    $vms = $VMList
+                    foreach ($vm in $vms) {
+                        if ($vm.Name -eq $skip) {
+                            $newVm = $vm
+                            $VMList.Remove($vm) 
+
+                            $last = $VMList[-1]
+
+                            $iteration = ([int]($last.Name -replace '\D+(\d+)','$1')) +1 
+
+                            $newVm.Name = "Automation$iteration"
+                            $VMList.Add($newVm)
+                        }
+                    }
+                }
             }
         }
     }

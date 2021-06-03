@@ -33,6 +33,7 @@ class VM:System.ICloneable {
     [Provisioning]$Provisioning
     [HyperVServer[]]$HyperVServers
     [guid]$ReplicaGuid
+    [string[]]$SkipNames
 }
 
 class DeploymentOptions {
