@@ -36,6 +36,36 @@ function Confirm-ExistingVMRemovalAndAdd {
 
 }
 
+function Remove-ExistingVM {
+    Param
+    (
+        [Parameter(Mandatory)]
+        [VM]$VM,
+        [string[]]$HyperVServers,
+        [bool] $Replace,
+        [bool] $Force
+    )
+
+    $existingVM, $existingHypervisor = Assert-VMAlreadyExists -VM $VM -HyperVServers $HyperVServers
+    if ($existingVM -and $Replace -and !$Force) {
+        $name = $existingVM.Name
+        Write-Host "$name found, remove?" -ForegroundColor Red
+        $ReplaceConfirm = Read-Host "Press Y to confirm" 
+        if ($ReplaceConfirm.ToLower() -eq "y") {
+            Write-Verbose "Existing VM found, removing"
+            Remove-VM  $VM.Name -ComputerName $existingHypervisor
+        }
+        else {
+            throw
+        }
+    }
+    elseif ($existingVM -and $Replace -and $Force) {
+        Write-Verbose "Existing VM found, removing"
+        Remove-VM $VM.Name -ComputerName $existingHypervisor
+    }
+
+}
+
 function Publish-VMs {
     Param
     (
@@ -45,7 +75,8 @@ function Publish-VMs {
         [DeploymentOptions]$DeploymentOptions,
         [bool] $Replace,
         [bool] $Force,
-        [bool] $Destroy
+        [bool] $Destroy,
+        [bool] $ReplaceUpFront
 
     )
 
@@ -154,6 +185,13 @@ function Publish-VMs {
 
     if (!$Destroy) {
 
+        if ($ReplaceUpFront){
+            Write-Host "Removing existing VM's up front"
+            foreach($vm in $VMList) {
+                Remove-ExistingVM  -VM $vm -HyperVServers $HyperVServers  -Replace $Replace -Force $Force 
+            }
+        }
+
         if ($DeploymentOptions.Parallel) {
             Get-Job | Remove-Job -Force
             $MaxThreads = 5
@@ -181,6 +219,7 @@ function Publish-VMs {
 
             Confirm-ExistingVMRemovalAndAdd -VM $VM -HyperVServers $HyperVServers -HyperVServer $vm.HyperVServers[0] -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $true 
         }
+
         Write-Host "Adding Virtual Machines" -ForegroundColor Yellow
 
 

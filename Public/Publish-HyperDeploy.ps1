@@ -31,7 +31,8 @@ function Publish-HyperDeploy {
         [String] $DefinitionFile,
         [Switch] $Replace,
         [Switch] $Force,
-        [Switch] $Destroy
+        [Switch] $Destroy,
+        [Switch] $ReplaceUpFront
     )
 
     #Requires -RunAsAdministrator
@@ -42,12 +43,17 @@ function Publish-HyperDeploy {
         $servers = @()
 
         foreach($vm in $definition.VMs){
+
+            if (!$vm.HyperVServers){
+
+                $vm.HyperVServers = @()
+                $server = New-Object HyperVServer
+                $server.Name = $env:computername
+                $vm.HyperVServers += $server
+            }
+
             foreach($server in $vm.HyperVServers){
                 
-                if (!$server.Name){
-                    $server.Name = $env:computername;
-                }
-
                 $servers += $server.Name
 
                 if (!$server.MaxReplicas) {
@@ -57,7 +63,7 @@ function Publish-HyperDeploy {
         }
 
         Test-HyperVServerConnectivity -HyperVServers ($servers | Get-Unique)
-        Publish-VMs -HyperVServers ($servers | Get-Unique) -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -Destroy $Destroy
+        Publish-VMs -HyperVServers ($servers | Get-Unique) -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -Destroy $Destroy -ReplaceUpFront $ReplaceUpFront
         Clear-TempFiles -HyperVServers ($servers | Get-Unique)
     }
 
