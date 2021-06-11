@@ -35,12 +35,29 @@ function Publish-HyperDeploy {
         [Switch] $ReplaceUpFront
     )
 
-    #Requires -RunAsAdministrator
+    
+
+    write-host @"
+
+
+    __  __                          __           __           
+   / / / /_  ______  ___  _________/ /__  ____  / /___  __  __
+  / /_/ / / / / __ \/ _ \/ ___/ __  / _ \/ __ \/ / __ \/ / / /
+ / __  / /_/ / /_/ /  __/ /  / /_/ /  __/ /_/ / / /_/ / /_/ / 
+/_/ /_/\__, / .___/\___/_/   \__,_/\___/ .___/_/\____/\__, /  
+      /____/_/                        /_/            /____/   
+
+
+"@
+
+#Requires -RunAsAdministrator
 
     if ($PSCmdlet.ShouldProcess("Target", "Operation")) {
         $definition = Test-DefinitionFile -DefinitionFile $DefinitionFile
 
         $servers = @()
+
+    
 
         foreach($vm in $definition.VMs){
 
