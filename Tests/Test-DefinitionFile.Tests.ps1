@@ -46,7 +46,7 @@ Describe 'Test-DefinitionFile Tests' {
         ]
     }"
 
-    { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - GoldenImagePath is not a valid vhdx file"
+    { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - GoldenImagePath is not a valid vhd/vhdx file"
 
   }
 

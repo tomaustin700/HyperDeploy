@@ -3,6 +3,7 @@ class HyperVServer {
     [System.Nullable[int]]$MaxReplicas
     [string]$SwitchName
     [string]$GoldenImagePath
+    [string]$GoldenImageExtension
     [string]$VMHardDiskPath
 }
 

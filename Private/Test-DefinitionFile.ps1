@@ -28,14 +28,20 @@ function Test-DefinitionFile {
         }
 
         foreach($server in $definitionVM.HyperVServers){
-            if ($server.GoldenImagePath -and !$server.GoldenImagePath.ToLower().EndsWith("vhdx")) {
-                throw "$name - GoldenImagePath is not a valid vhdx file"
+            if ($server.GoldenImagePath -and !$server.GoldenImagePath.StartsWith("http") -and !$server.GoldenImagePath.ToLower().EndsWith("vhdx") -and !$server.GoldenImagePath.ToLower().EndsWith("vhd")) {
+                throw "$name - GoldenImagePath is not a valid vhd/vhdx file"
             }
         }
 
         foreach($server in $definitionVM.HyperVServers){
             if ($server.GoldenImagePath -and $server.GoldenImagePath.ToLower().StartsWith("filesystem")) {
                 throw "$name - GoldenImagePath is not a valid UNC path, UNC paths should start with \\"
+            }
+        }
+
+        foreach($server in $definitionVM.HyperVServers){
+            if ($server.GoldenImagePath -and $server.GoldenImagePath.StartsWith("http") -and !$server.GoldenImageExtension) {
+                throw "$name - GoldenImageExtension must be provided when using a URL image path"
             }
         }
 
