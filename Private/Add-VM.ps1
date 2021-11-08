@@ -24,7 +24,7 @@ function Add-VM {
         ProcessorCount     = $VM.ProcessorCount
         MemoryMaximumBytes = [int64][scriptblock]::Create($VM.MemoryMaximumBytes).Invoke()[0]  
         ComputerName       = $HyperVServer.Name
-        DynamicMemory = $true
+        DynamicMemory      = $true
     }
 
     if ($VM.CheckpointType) {
@@ -70,7 +70,9 @@ function Add-VM {
                         $localPath = $using:path
     
                         $temp = $env:TEMP
-                        $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
+                        $extension = $localPath.Split('.')[-1]
+
+                        $tempGI = "$temp\HyperDeployGoldenImage.$extension"
         
                         if (!(Test-Path "filesystem::$localPath")) {
                             throw "$localPath does not exist"
@@ -82,7 +84,7 @@ function Add-VM {
                             Copy-Item "filesystem::$localPath" -Destination $tempGI
                         }
                         
-                        Copy-Item $tempGI -Destination "$using:diskPath\Disk.vhdx"
+                        Copy-Item $tempGI -Destination "$using:diskPath\Disk.$extension"
                     
                     }
                 }
@@ -92,7 +94,8 @@ function Add-VM {
             }
             elseif ($HyperVServer.GoldenImagePath.StartsWith("http")) {
                 $temp = $env:TEMP
-                $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
+                $extension = $HyperVServer.GoldenImageExtension
+                $tempGI = "$temp\HyperDeployGoldenImage.$extension"
 
                 if ($HyperVServer.GoldenImagePath.Contains("drive.google")) {
                     $p = & { python -V } 2>&1
@@ -103,7 +106,7 @@ function Add-VM {
                     else {
                         pip install gdown
                         Set-Location $temp
-                        gdrive $HyperVServer.GoldenImagePath -O "HyperDeployGoldenImage.vhdx"
+                        gdrive $HyperVServer.GoldenImagePath -O "HyperDeployGoldenImage.$extension"
                     }
 
                 }
@@ -118,7 +121,9 @@ function Add-VM {
                         throw "$localPath does not exist"
                     }
 
-                    Copy-Item $localPath -Destination "$using:diskPath\Disk.vhdx"
+                    $extension = $localPath.Split('.')[-1]
+
+                    Copy-Item $localPath -Destination "$using:diskPath\Disk.$extension"
                 }
             }
         }
@@ -132,13 +137,17 @@ function Add-VM {
             New-VHD @NewVHDParams
         }
 
-        $AddVMHardDiskDriveParams = @{ 
-            Path         = "$diskPath\Disk.vhdx"
-            VMName       = $VM.Name
-            ComputerName = $HyperVServer.Name
-        }
+        Invoke-Command  -ComputerName $HyperVServer.Name { 
+            $disk = Get-ChildItem -Path $using:diskPath -Filter "Disk.*" -Recurse -Force 
+            $name = $using:VM.Name
 
-        Add-VMHardDiskDrive @AddVMHardDiskDriveParams
+            $AddVMHardDiskDriveParams = @{ 
+                Path         = $disk[0].FullName
+                VMName       = $name
+            }
+
+            Add-VMHardDiskDrive @AddVMHardDiskDriveParams
+        }
     }
 
     if ($DeploymentOptions -and $DeploymentOptions.StartAfterCreation) {
