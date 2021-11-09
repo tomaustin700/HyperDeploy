@@ -8,12 +8,13 @@ function Clear-TempFiles {
         Invoke-Command -ComputerName $server {
 
             $temp = $env:TEMP
-            $tempGI = "$temp\HyperDeployGoldenImage.vhdx"
+            Write-Verbose "Removing Temp Golden Image if exists"
 
-            Write-Verbose "Removing $tempGI"
+            if (Test-Path -Path "$temp\HyperDeployGoldenImage.vhdx"){
+                Remove-Item "$temp\HyperDeployGoldenImage.vhdx" -Force
 
-            if (Test-Path $tempGI) {
-                Remove-Item $tempGI -Force
+            }elseif (Test-Path -Path "$temp\HyperDeployGoldenImage.vhd") {
+                Remove-Item "$temp\HyperDeployGoldenImage.vhd" -Force
             }
 
         }
