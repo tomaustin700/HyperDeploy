@@ -50,7 +50,13 @@ function Publish-HyperDeploy {
 
 "@
 
-#Requires -RunAsAdministrator
+    #Requires -RunAsAdministrator
+
+    $installed = Get-Module -Name "Hyper-V"
+    if (!$installed) {
+        write-host "Hyper-V module not installed, please install and try again"
+        exit
+    }
 
     if ($PSCmdlet.ShouldProcess("Target", "Operation")) {
         $definition = Test-DefinitionFile -DefinitionFile $DefinitionFile
@@ -59,9 +65,9 @@ function Publish-HyperDeploy {
 
     
 
-        foreach($vm in $definition.VMs){
+        foreach ($vm in $definition.VMs) {
 
-            if (!$vm.HyperVServers){
+            if (!$vm.HyperVServers) {
 
                 $vm.HyperVServers = @()
                 $server = New-Object HyperVServer
@@ -69,7 +75,7 @@ function Publish-HyperDeploy {
                 $vm.HyperVServers += $server
             }
 
-            foreach($server in $vm.HyperVServers){
+            foreach ($server in $vm.HyperVServers) {
                 
                 $servers += $server.Name
 
