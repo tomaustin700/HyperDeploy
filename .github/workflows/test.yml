@@ -1,0 +1,13 @@
+name: Run Tests
+on: push
+
+jobs:
+  pester-test:
+    name: Pester test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Run Tests
+        shell: pwsh
+        run: .\Tests\RunTests.ps1
