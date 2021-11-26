@@ -3,8 +3,8 @@ Describe 'Publish-VMs Tests' {
     It 'AddingMoreReplicasThanMaxReplicas_ShouldThrow' {
 
         $rootDir = (get-item $PSScriptRoot).Parent.FullName
-        . "$rootDir\Private\Publish-VMs"
-        . "$rootDir\Private\Classes"
+        . "$rootDir\Private\Publish-VMs.ps1"
+        . "$rootDir\Private\Classes.ps1"
    
 
         $vms = @()
@@ -17,8 +17,8 @@ Describe 'Publish-VMs Tests' {
     It 'HavingEnoughHypervisorCapacityForVMs_ShouldNotThrow' {
 
         $rootDir = (get-item $PSScriptRoot).Parent.FullName
-        . "$rootDir\Private\Publish-VMs"
-        . "$rootDir\Private\Classes"
+        . "$rootDir\Private\Publish-VMs.ps1"
+        . "$rootDir\Private\Classes.ps1"
 
         Mock Confirm-ExistingVMRemovalAndAdd
     

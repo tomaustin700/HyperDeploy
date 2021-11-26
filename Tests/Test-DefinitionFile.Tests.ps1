@@ -3,8 +3,8 @@ Describe 'Test-DefinitionFile Tests' {
   It 'NewVMDiskSizeBytesAndGoldenImagePathStopsExecution_ShouldThrow' {
 
     $rootDir = (get-item $PSScriptRoot).Parent.FullName
-    . "$rootDir\Private\Test-DefinitionFile"
-    . "$rootDir\Private\Classes"
+    . "$rootDir\Private\Test-DefinitionFile.ps1"
+    . "$rootDir\Private\Classes.ps1"
 
 
     $defFile = @'
@@ -37,8 +37,8 @@ Describe 'Test-DefinitionFile Tests' {
   It 'GoldenImageCanOnlyBeVHDX_ShouldThrow' {
 
     $rootDir = (get-item $PSScriptRoot).Parent.FullName
-    . "$rootDir\Private\Test-DefinitionFile"
-    . "$rootDir\Private\Classes"
+    . "$rootDir\Private\Test-DefinitionFile.ps1"
+    . "$rootDir\Private\Classes.ps1"
 
     $defFile = @'
     {
@@ -70,8 +70,8 @@ Describe 'Test-DefinitionFile Tests' {
   It 'GoldenImagePathHasToBeValidUNCPath_ShouldThrow' {
 
     $rootDir = (get-item $PSScriptRoot).Parent.FullName
-    . "$rootDir\Private\Test-DefinitionFile"
-    . "$rootDir\Private\Classes"
+    . "$rootDir\Private\Test-DefinitionFile.ps1"
+    . "$rootDir\Private\Classes.ps1"
 
     $defFile = @'
     {
@@ -103,8 +103,8 @@ Describe 'Test-DefinitionFile Tests' {
   It 'VMHardDiskPathMustBeSetWhenSpecifyingNewVMDiskSizeBytes_ShouldThrow' {
 
     $rootDir = (get-item $PSScriptRoot).Parent.FullName
-    . "$rootDir\Private\Test-DefinitionFile"
-    . "$rootDir\Private\Classes"
+    . "$rootDir\Private\Test-DefinitionFile.ps1"
+    . "$rootDir\Private\Classes.ps1"
 
     $defFile = @'
       {
@@ -131,8 +131,8 @@ Describe 'Test-DefinitionFile Tests' {
   It 'VMHardDiskPathMustBeSetWhenSpecifyingGoldenImagePath_ShouldThrow' {
 
     $rootDir = (get-item $PSScriptRoot).Parent.FullName
-    . "$rootDir\Private\Test-DefinitionFile"
-    . "$rootDir\Private\Classes"
+    . "$rootDir\Private\Test-DefinitionFile.ps1"
+    . "$rootDir\Private\Classes.ps1"
 
 
     $defFile = @'
@@ -158,8 +158,8 @@ Describe 'Test-DefinitionFile Tests' {
   It 'SpecifyingProvisionScriptsRequiresGoldenImagePathToBeSet_ShouldThrow' {
 
     $rootDir = (get-item $PSScriptRoot).Parent.FullName
-    . "$rootDir\Private\Test-DefinitionFile"
-    . "$rootDir\Private\Classes"
+    . "$rootDir\Private\Test-DefinitionFile.ps1"
+    . "$rootDir\Private\Classes.ps1"
 
     $defFile = @'
       {
@@ -194,8 +194,8 @@ Describe 'Test-DefinitionFile Tests' {
   It 'SpecifyingProvisionScriptsRequiresSwitchNameToBeSet_ShouldThrow' {
 
     $rootDir = (get-item $PSScriptRoot).Parent.FullName
-    . "$rootDir\Private\Test-DefinitionFile"
-    . "$rootDir\Private\Classes"
+    . "$rootDir\Private\Test-DefinitionFile.ps1"
+    . "$rootDir\Private\Classes.ps1"
 
     $defFile = @'
     {
@@ -230,8 +230,8 @@ Describe 'Test-DefinitionFile Tests' {
   It 'SpecifyingProvisionScriptsRequiresDeploymentOptionsStartAfterCreate_ShouldThrow' {
 
     $rootDir = (get-item $PSScriptRoot).Parent.FullName
-    . "$rootDir\Private\Test-DefinitionFile"
-    . "$rootDir\Private\Classes"
+    . "$rootDir\Private\Test-DefinitionFile.ps1"
+    . "$rootDir\Private\Classes.ps1"
 
     $defFile = @'
     {
@@ -267,8 +267,8 @@ Describe 'Test-DefinitionFile Tests' {
   It 'ProvisionScriptsMustHavePS1Extension_ShouldThrow' {
 
     $rootDir = (get-item $PSScriptRoot).Parent.FullName
-    . "$rootDir\Private\Test-DefinitionFile"
-    . "$rootDir\Private\Classes"
+    . "$rootDir\Private\Test-DefinitionFile.ps1"
+    . "$rootDir\Private\Classes.ps1"
 
     $defFile = @'
     {
@@ -304,8 +304,8 @@ Describe 'Test-DefinitionFile Tests' {
   It 'UNCCredentialScriptRequiredWhenGoldenImagePathIsUNC_ShouldThrow' {
 
     $rootDir = (get-item $PSScriptRoot).Parent.FullName
-    . "$rootDir\Private\Test-DefinitionFile"
-    . "$rootDir\Private\Classes"
+    . "$rootDir\Private\Test-DefinitionFile.ps1"
+    . "$rootDir\Private\Classes.ps1"
 
 
     $defFile = @'
@@ -336,8 +336,8 @@ Describe 'Test-DefinitionFile Tests' {
   It 'UNCCredentialScriptCanOnlyBePS1Script_ShouldThrow' {
 
     $rootDir = (get-item $PSScriptRoot).Parent.FullName
-    . "$rootDir\Private\Test-DefinitionFile"
-    . "$rootDir\Private\Classes"
+    . "$rootDir\Private\Test-DefinitionFile.ps1"
+    . "$rootDir\Private\Classes.ps1"
 
     $defFile = @'
       {
