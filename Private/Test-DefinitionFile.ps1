@@ -5,7 +5,7 @@ function Test-DefinitionFile {
         [string]$DefinitionJson
     )
 
-    Write-Host "Parsing and validating defintion..." -ForegroundColor Yellow
+    Write-Verbose "Parsing and validating defintion..."
    
     if ($DefinitionFile) {
         $definition = [Definition](Get-Content $DefinitionFile -Raw | Out-String | ConvertFrom-Json)

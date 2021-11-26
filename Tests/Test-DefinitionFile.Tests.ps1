@@ -7,19 +7,28 @@ Describe 'Test-DefinitionFile Tests' {
     . "$rootDir\Private\Classes"
 
 
-    $defFile = "{
-        `"VMs`": [
-            {
-                `"Name`": `"Test`",
-                `"NewVMDiskSizeBytes`": `"1GB`",
-                `"HyperVServers`": [
+    $defFile = @'
+    {
+      "VMs": [
+          {
+              "Name": "Test",
+              "ProcessorCount": 8,
+              "MemoryStartupBytes": "1GB",
+              "MemoryMaximumBytes": "8GB",
+              "CheckpointType": "Disabled",
+              "NewVMDiskSizeBytes": "1GB",
+              "HyperVServers": [
                   {
-                      `"GoldenImagePath`": `"C:\\Test.vhdx`",
+                      "Name": "TestServer",
+                      "SwitchName": "VM Virtual Switch",
+                      "GoldenImagePath": "C:\\Test.vhdx"
+                      
                   }
               ]
-            }
-        ]
-    }"
+          }
+      ]
+  }
+'@
 
     { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - NewVMDiskSizeBytes and GoldenImagePath set, only one must be specified"
 
@@ -31,20 +40,28 @@ Describe 'Test-DefinitionFile Tests' {
     . "$rootDir\Private\Test-DefinitionFile"
     . "$rootDir\Private\Classes"
 
-
-    $defFile = "{
-        `"VMs`": [
-            {
-                `"Name`": `"Test`",
-                `"HyperVServers`": [
+    $defFile = @'
+    {
+      "VMs": [
+          {
+              "Name": "Test",
+              "ProcessorCount": 8,
+              "MemoryStartupBytes": "1GB",
+              "MemoryMaximumBytes": "8GB",
+              "CheckpointType": "Disabled",
+              "HyperVServers": [
                   {
-                      `"GoldenImagePath`": `"C:\\Test`",
-                      `"VMHardDiskPath`" : `"C:\\Test`"
+                      "Name": "TestServer",
+                      "SwitchName": "VM Virtual Switch",
+                      "GoldenImagePath": "C:\\Test",
+                      "VMHardDiskPath": "C:\\Test"
+                      
                   }
               ]
-            }
-        ]
-    }"
+          }
+      ]
+  }
+'@
 
     { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - GoldenImagePath is not a valid vhd/vhdx file"
 
@@ -56,21 +73,28 @@ Describe 'Test-DefinitionFile Tests' {
     . "$rootDir\Private\Test-DefinitionFile"
     . "$rootDir\Private\Classes"
 
-
-    $defFile = "{
-        `"VMs`": [
-            {
-                `"Name`": `"Test`",
-                `"HyperVServers`": [
+    $defFile = @'
+    {
+      "VMs": [
+          {
+              "Name": "Test",
+              "ProcessorCount": 8,
+              "MemoryStartupBytes": "1GB",
+              "MemoryMaximumBytes": "8GB",
+              "CheckpointType": "Disabled",
+              "HyperVServers": [
                   {
-                      `"GoldenImagePath`": `"filesystem:\\server\\c$\\Test.vhdx`",
-                      `"VMHardDiskPath`" : `"C:\\Test`"
+                      "Name": "TestServer",
+                      "SwitchName": "VM Virtual Switch",
+                      "GoldenImagePath": "filesystem:\\server\\c$\\Test.vhdx",
+                      "VMHardDiskPath": "C:\\Test"
+                      
                   }
               ]
-                
-            }
-        ]
-    }"
+          }
+      ]
+  }
+'@
 
     { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - GoldenImagePath is not a valid UNC path, UNC paths should start with \\"
 
@@ -82,20 +106,23 @@ Describe 'Test-DefinitionFile Tests' {
     . "$rootDir\Private\Test-DefinitionFile"
     . "$rootDir\Private\Classes"
 
-
-    $defFile = "{
-        `"VMs`": [
+    $defFile = @'
+      {
+        "VMs": [
             {
-                `"Name`": `"Test`",
-                `"NewVMDiskSizeBytes`": `"1GB`",
-                `"HyperVServers`": [
-                  {
-                      
-                  }
-              ]
+                "Name": "Test",
+                "NewVMDiskSizeBytes": "1GB",
+                "HyperVServers": [
+                    {
+                       
+                        
+                    }
+                ]
             }
         ]
-    }"
+    }
+'@
+
 
     { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - You must specify VMHardDiskPath when setting NewVMDiskSizeBytes or GoldenImagePath"
 
@@ -108,18 +135,21 @@ Describe 'Test-DefinitionFile Tests' {
     . "$rootDir\Private\Classes"
 
 
-    $defFile = "{
-        `"VMs`": [
+    $defFile = @'
+      {
+        "VMs": [
             {
-                `"Name`": `"Test`",
-                `"HyperVServers`": [
-                  {
-                      `"GoldenImagePath`": `"C:\\Test.vhdx`",
-                  }
-              ]
+                "Name": "Test",
+                "HyperVServers": [
+                    {
+                      "GoldenImagePath": "C:\\Test.vhdx"
+                        
+                    }
+                ]
             }
         ]
-    }"
+    }
+'@
 
     { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - You must specify VMHardDiskPath when setting NewVMDiskSizeBytes or GoldenImagePath"
 
@@ -131,24 +161,31 @@ Describe 'Test-DefinitionFile Tests' {
     . "$rootDir\Private\Test-DefinitionFile"
     . "$rootDir\Private\Classes"
 
-
-    $defFile = "{
-        `"VMs`": [
+    $defFile = @'
+      {
+        "DeploymentOptions": {
+          "StartAfterCreation": true
+        },
+        "VMs": [
             {
-                `"Name`": `"Test`",
-                `"HyperVServers`": [
-                  {
-                      `"SwitchName`": `"Test`",
-                  }
-                  ],
-                `"Provisioning`" : {
-                  `"Scripts`": [
-                      `"C:\\Test.ps1`"
-                  ] 
+                "Name": "Test",
+                "HyperVServers": [
+                    {
+                      "SwitchName": "Test",
+                      "VMHardDiskPath": "C:\\Test"
+                        
+                    }
+                ],
+                "Provisioning": {
+                  "RebootAfterEachScript": true,
+                  "Scripts": [
+                      "C:\\Test.ps1"
+                  ]
               }
             }
         ]
-    }"
+    }
+'@
 
     { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - Provision Scripts can only be used if GoldenImagePath set"
 
@@ -160,26 +197,31 @@ Describe 'Test-DefinitionFile Tests' {
     . "$rootDir\Private\Test-DefinitionFile"
     . "$rootDir\Private\Classes"
 
-
-    $defFile = "{
-        `"VMs`": [
-            {
-                `"Name`": `"Test`",
-                `"HyperVServers`": [
+    $defFile = @'
+    {
+      "DeploymentOptions": {
+        "StartAfterCreation": true
+      },
+      "VMs": [
+          {
+              "Name": "Test",
+              "HyperVServers": [
                   {
-                      `"GoldenImagePath`": `"C:\\Test.vhdx`",
-                      `"VMHardDiskPath`" : `"C:\\Test`"
+                    "VMHardDiskPath": "C:\\Test",
+                    "GoldenImagePath": "C:\\Test.vhdx"
+                      
                   }
               ],
-                
-                `"Provisioning`" : {
-                  `"Scripts`": [
-                      `"C:\\Test.ps1`"
-                  ] 
-              }
+              "Provisioning": {
+                "RebootAfterEachScript": true,
+                "Scripts": [
+                    "C:\\Test.ps1"
+                ]
             }
-        ]
-    }"
+          }
+      ]
+  }
+'@
 
     { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - Provision Scripts can only be used if SwitchName set"
 
@@ -191,28 +233,32 @@ Describe 'Test-DefinitionFile Tests' {
     . "$rootDir\Private\Test-DefinitionFile"
     . "$rootDir\Private\Classes"
 
-    $defFile = "{
-      `"DeploymentOptions`": {
-             `"StartAfterCreation`": false
-             },
-      `"VMs`": [
+    $defFile = @'
+    {
+      "DeploymentOptions": {
+        "StartAfterCreation": false
+      },
+      "VMs": [
           {
-              `"Name`": `"Test`",
-              `"HyperVServers`": [
-                {
-                    `"GoldenImagePath`": `"C:\\Test.vhdx`",
-                    `"VMHardDiskPath`" : `"C:\\Test`",
-                    `"SwitchName`" : `"Test`"
-                }
-            ],
-              `"Provisioning`" : {
-                `"Scripts`": [
-                    `"C:\\Test.ps1`"
-                ] 
+              "Name": "Test",
+              "HyperVServers": [
+                  {
+                    "VMHardDiskPath": "C:\\Test",
+                    "GoldenImagePath": "C:\\Test.vhdx",
+                    "SwitchName": "Test"
+                      
+                  }
+              ],
+              "Provisioning": {
+                "RebootAfterEachScript": true,
+                "Scripts": [
+                    "C:\\Test.ps1"
+                ]
             }
           }
       ]
-  }"
+  }
+'@
 
     { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - Provision Scripts can only be used if DeploymentOptions.StartAfterCreation is true"
 
@@ -224,30 +270,34 @@ Describe 'Test-DefinitionFile Tests' {
     . "$rootDir\Private\Test-DefinitionFile"
     . "$rootDir\Private\Classes"
 
-    $defFile = "{
-      `"DeploymentOptions`": {
-             `"StartAfterCreation`": false
-             },
-      `"VMs`": [
+    $defFile = @'
+    {
+      "DeploymentOptions": {
+        "StartAfterCreation": true
+      },
+      "VMs": [
           {
-              `"Name`": `"Test`",
-              `"HyperVServers`": [
-                {
-                    `"GoldenImagePath`": `"C:\\Test.vhdx`",
-                    `"VMHardDiskPath`" : `"C:\\Test`",
-                    `"SwitchName`" : `"Test`"
-                }
-            ],
-              `"Provisioning`" : {
-                `"Scripts`": [
-                    `"C:\\Test.exe`"
-                ] 
+              "Name": "Test",
+              "HyperVServers": [
+                  {
+                    "VMHardDiskPath": "C:\\Test",
+                    "GoldenImagePath": "C:\\Test.vhdx",
+                    "SwitchName": "Test"
+                      
+                  }
+              ],
+              "Provisioning": {
+                "RebootAfterEachScript": true,
+                "Scripts": [
+                    "C:\\Test.exe"
+                ]
             }
           }
       ]
-  }"
+  }
+'@
 
-    { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - Provision Scripts can only be used if DeploymentOptions.StartAfterCreation is true"
+    { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - C:\Test.exe - Provision Script must be a valid ps1 file"
 
   }
 
@@ -258,21 +308,26 @@ Describe 'Test-DefinitionFile Tests' {
     . "$rootDir\Private\Classes"
 
 
-    $defFile = "{
-        `"VMs`": [
+    $defFile = @'
+      {
+        "DeploymentOptions": {
+          "StartAfterCreation": true
+        },
+        "VMs": [
             {
-                `"Name`": `"Test`",
-                `"HyperVServers`": [
-                  {
-                      `"GoldenImagePath`": `"\\\\UNC\\Test.vhdx`",
-                      `"VMHardDiskPath`" : `"C:\\Test`"
-                  }
-              ],
-                
+                "Name": "Test",
+                "HyperVServers": [
+                    {
+                      "VMHardDiskPath": "C:\\Test",
+                      "GoldenImagePath": "\\\\UNC\\Test.vhdx"
+                        
+                    }
+                ]
               
             }
         ]
-    }"
+    }
+'@
 
     { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - UNCCredentialScript is required when GoldenImagePath is a UNC path"
 
@@ -284,23 +339,27 @@ Describe 'Test-DefinitionFile Tests' {
     . "$rootDir\Private\Test-DefinitionFile"
     . "$rootDir\Private\Classes"
 
-
-    $defFile = "{
-        `"VMs`": [
+    $defFile = @'
+      {
+        "DeploymentOptions": {
+          "StartAfterCreation": true
+        },
+        "VMs": [
             {
-                `"Name`": `"Test`",
-                `"HyperVServers`": [
-                  {
-                      `"GoldenImagePath`": `"\\\\UNC\\Test.vhdx`",
-                      `"VMHardDiskPath`" : `"C:\\Test`"
-                  }
-              ],
-                `"UNCCredentialScript`": `"Test`"
-                
+                "Name": "Test",
+                "HyperVServers": [
+                    {
+                      "VMHardDiskPath": "C:\\Test",
+                      "GoldenImagePath": "\\\\UNC\\Test.vhdx"
+                        
+                    }
+                ],
+                UNCCredentialScript: "Test"
               
             }
         ]
-    }"
+    }
+'@
 
     { Test-DefinitionFile -DefinitionJson $defFile } | Should -Throw "Test - UNCCredentialScript must be a valid ps1 script"
 
