@@ -8,7 +8,8 @@ function Confirm-ExistingVMRemovalAndAdd {
         [string[]]$HyperVServers,
         [bool] $Replace,
         [bool] $Force,
-        [DeploymentOptions] $DeploymentOptions
+        [DeploymentOptions] $DeploymentOptions,
+        [bool] $ContinueOnError
 
     )
 
@@ -19,7 +20,7 @@ function Confirm-ExistingVMRemovalAndAdd {
         $ReplaceConfirm = Read-Host "Press Y to confirm" 
         if ($ReplaceConfirm.ToLower() -eq "y") {
             Remove-VM  $VM.Name -ComputerName $existingHypervisor
-            Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions 
+            Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -ContinueOnError $ContinueOnError
         }
         else {
             throw
@@ -28,10 +29,10 @@ function Confirm-ExistingVMRemovalAndAdd {
     elseif ($existingVM -and $Replace -and $Force) {
         Write-Verbose "Existing VM found, replacing."
         Remove-VM $VM.Name -ComputerName $existingHypervisor
-        Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions 
+        Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -ContinueOnError $ContinueOnError 
     }
     elseif (!$existingVM) {
-        Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions 
+        Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions  -ContinueOnError $ContinueOnError
     }
 
 }
@@ -76,7 +77,8 @@ function Publish-VMs {
         [bool] $Replace,
         [bool] $Force,
         [bool] $Destroy,
-        [bool] $ReplaceUpFront
+        [bool] $ReplaceUpFront,
+        [bool] $ContinueOnError
 
     )
 
@@ -217,7 +219,7 @@ function Publish-VMs {
 
             $VM.Provisioning = $Provisioning
 
-            Confirm-ExistingVMRemovalAndAdd -VM $VM -HyperVServers $HyperVServers -HyperVServer $vm.HyperVServers[0] -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $true 
+            Confirm-ExistingVMRemovalAndAdd -VM $VM -HyperVServers $HyperVServers -HyperVServer $vm.HyperVServers[0] -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $true -ContinueOnError $ContinueOnError
         }
 
         Write-Verbose "Adding Virtual Machines"
@@ -231,7 +233,7 @@ function Publish-VMs {
                 Start-Job -Scriptblock $addBlock -ArgumentList $vm, $vm.Provisioning, $key, $HyperVServers, $DeploymentOptions, $Replace
             }
             else {
-                Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -HyperVServer $vm.HyperVServers[0] -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force 
+                Confirm-ExistingVMRemovalAndAdd -VM $vm -HyperVServers $HyperVServers -HyperVServer $vm.HyperVServers[0] -DeploymentOptions $DeploymentOptions -Replace $Replace -Force $Force -ContinueOnError $ContinueOnError
             }
         }
 

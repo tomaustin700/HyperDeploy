@@ -32,7 +32,9 @@ function Publish-HyperDeploy {
         [Switch] $Replace,
         [Switch] $Force,
         [Switch] $Destroy,
-        [Switch] $ReplaceUpFront
+        [Switch] $ReplaceUpFront,
+        [Switch] $ContinueOnError
+
     )
 
     
@@ -86,7 +88,7 @@ function Publish-HyperDeploy {
         }
 
         Test-HyperVServerConnectivity -HyperVServers ($servers | Get-Unique)
-        Publish-VMs -HyperVServers ($servers | Get-Unique) -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -Destroy $Destroy -ReplaceUpFront $ReplaceUpFront
+        Publish-VMs -HyperVServers ($servers | Get-Unique) -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -Destroy $Destroy -ReplaceUpFront $ReplaceUpFront -ContinueOnError $ContinueOnError
         Clear-TempFiles -HyperVServers ($servers | Get-Unique)
     }
 

@@ -86,54 +86,45 @@ function Initialize-VM {
 
     $newCred = $null
 
-    try {
-        foreach ($script in $VM.Provisioning.Scripts) {
+    foreach ($script in $VM.Provisioning.Scripts) {
 
 
-            if ($script.EndsWith(".Set-Credential.ps1")) {
+        if ($script.EndsWith(".Set-Credential.ps1")) {
                 
-                Write-Verbose "Credential script detected, getting credentials"
+            Write-Verbose "Credential script detected, getting credentials"
     
-                $credObject = invoke-expression -Command $script
+            $credObject = invoke-expression -Command $script
     
-                if ($credObject -and $credObject.GetType().Name -eq 'PSCredential') {
-                    Write-Verbose "New credentials set" 
+            if ($credObject -and $credObject.GetType().Name -eq 'PSCredential') {
+                Write-Verbose "New credentials set" 
     
-                    $newCred = $credObject
-                }
+                $newCred = $credObject
             }
-            else {
+        }
+        else {
     
-                Write-Verbose "Provisioning $VMName using $script" 
+            Write-Verbose "Provisioning $VMName using $script" 
     
-                $InvokeParams = @{ 
-                    FilePath     = $script
-                    ComputerName = $ip[1]
-                }
+            $InvokeParams = @{ 
+                FilePath     = $script
+                ComputerName = $ip[1]
+            }
                
-                if ($newCred) {
-                    $InvokeParams.Add("Credential", $newCred)
-                }
+            if ($newCred) {
+                $InvokeParams.Add("Credential", $newCred)
+            }
                 
-                invoke-command @InvokeParams
+            invoke-command @InvokeParams
         
-                if ($VM.Provisioning.RebootAfterEachScript) {
-                    Stop-VM -Name  $VMName -ComputerName $HyperVServer.Name -Force
-                    Start-VM -Name  $VMName -ComputerName $HyperVServer.Name
+            if ($VM.Provisioning.RebootAfterEachScript) {
+                Stop-VM -Name  $VMName -ComputerName $HyperVServer.Name -Force
+                Start-VM -Name  $VMName -ComputerName $HyperVServer.Name
             
-                    Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
-                }
+                Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
             }
         }
     }
-    catch {
-        if ($ErrorActionPreference -eq 'Stop') {
-            throw
-        }
-        elseif ($ErrorActionPreference -eq 'Continue' -or $ErrorActionPreference -eq 'Ignore') {
-            Write-Verbose "Error occured during provisioning, but continuing"
-        }
-    }     
+        
 
 }
 
