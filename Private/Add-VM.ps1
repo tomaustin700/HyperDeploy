@@ -35,8 +35,8 @@ function Add-VM {
             $SetVMParams.Add("CheckpointType", $VM.CheckpointType)
         }
 
-        New-VM  @NewVMParams | out-null
-        Set-VM @SetVMParams
+        New-VM  @NewVMParams -ErrorAction Stop | out-null
+        Set-VM @SetVMParams -ErrorAction Stop
 
         if ($HyperVServer.VMHardDiskPath) {
 
@@ -138,7 +138,7 @@ function Add-VM {
                     SizeBytes    = [int64][scriptblock]::Create($VM.NewVMDiskSizeBytes).Invoke()[0]
                     ComputerName = $HyperVServer.Name
                 }
-                New-VHD @NewVHDParams
+                New-VHD @NewVHDParams -ErrorAction Stop
             }
 
             Invoke-Command  -ComputerName $HyperVServer.Name { 
@@ -150,7 +150,7 @@ function Add-VM {
                     VMName = $name
                 }
 
-                Add-VMHardDiskDrive @AddVMHardDiskDriveParams
+                Add-VMHardDiskDrive @AddVMHardDiskDriveParams -ErrorAction Stop
             }
         }
 
