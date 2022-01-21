@@ -9,7 +9,10 @@
             "ProcessorCount": 1,
             "MemoryStartupBytes": "1GB",
             "MemoryMaximumBytes": "4GB",
-            "CheckpointType": "Disabled"
+            "CheckpointType": "Disabled",
+            "SkipNames": [
+                "TestVM3"
+            ]
         }
     ]
 }

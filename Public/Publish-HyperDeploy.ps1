@@ -54,11 +54,13 @@ function Publish-HyperDeploy {
 
     #Requires -RunAsAdministrator
 
-    $installed = Get-Module -Name "Hyper-V"
-    if (!$installed) {
+    try{
+        Get-VM
+    }catch{
         write-host "Hyper-V module not installed, please install and try again"
         exit
     }
+
 
     if ($PSCmdlet.ShouldProcess("Target", "Operation")) {
         $definition = Test-DefinitionFile -DefinitionFile $DefinitionFile

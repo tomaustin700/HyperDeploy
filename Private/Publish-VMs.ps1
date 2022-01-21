@@ -85,7 +85,7 @@ function Publish-VMs {
     [System.Collections.ArrayList]$VMList = $VMs
     if ($VMs.Where( { $_.Replicas -gt 0 }, 'First').Count -gt 0) {
         #Replicas Detected
-
+        $vmReplicaName = $VMs[0].Name
         foreach ($replicasRequired in $VMs.Where{ $_.Replicas -gt 0 }) {
 
             
@@ -174,7 +174,15 @@ function Publish-VMs {
 
                             $iteration = ([int]($last.Name -replace '\D+(\d+)','$1')) +1 
 
-                            $newVm.Name = "Automation$iteration"
+                            if ($newVm.Name = "$vmReplicaName$iteration"){
+                                #Skip is last to be created
+                                $iteration ++
+                                $newVm.Name = "$vmReplicaName$iteration"
+                            }else{
+                                $newVm.Name = "$vmReplicaName$iteration"
+
+                            }
+
                             $VMList.Add($newVm)
                         }
                     }
