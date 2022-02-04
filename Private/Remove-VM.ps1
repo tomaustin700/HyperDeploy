@@ -137,7 +137,7 @@ Function Remove-VM {
                             #remove the VM
                             $VM | ForEach-Object {
                                 Write-Verbose "Removing virtual machine $($_.name)"
-                                Remove-VM -Name $_.Name -Force
+                                Remove-VM -Name $_.Name -Force -ErrorAction Stop
                             } #foreach
                         } #if disk remove was successful
                         else {
@@ -159,7 +159,10 @@ Function Remove-VM {
             $steppablePipeline.Begin($PSCmdlet)
         }
         catch {
-            throw
+            if ($ContinueOnError -eq $false) {
+                throw
+            }
+            
         }
     }
  

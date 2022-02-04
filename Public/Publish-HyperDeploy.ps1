@@ -32,7 +32,9 @@ function Publish-HyperDeploy {
         [Switch] $Replace,
         [Switch] $Force,
         [Switch] $Destroy,
-        [Switch] $ReplaceUpFront
+        [Switch] $ReplaceUpFront,
+        [Switch] $ContinueOnError
+
     )
 
     
@@ -52,11 +54,13 @@ function Publish-HyperDeploy {
 
     #Requires -RunAsAdministrator
 
-    $installed = Get-Module -Name "Hyper-V"
-    if (!$installed) {
+    try{
+        Get-VM | Out-Null
+    }catch{
         write-host "Hyper-V module not installed, please install and try again"
         exit
     }
+
 
     if ($PSCmdlet.ShouldProcess("Target", "Operation")) {
         $definition = Test-DefinitionFile -DefinitionFile $DefinitionFile
@@ -77,7 +81,11 @@ function Publish-HyperDeploy {
 
             foreach ($server in $vm.HyperVServers) {
                 
-                $servers += $server.Name
+                if ($null -eq $server.Name){
+                    $server.Name = $env:computername
+                }
+                
+                $servers += $server
 
                 if (!$server.MaxReplicas) {
                     $server.MaxReplicas = 9999999
@@ -85,9 +93,9 @@ function Publish-HyperDeploy {
             }
         }
 
-        Test-HyperVServerConnectivity -HyperVServers ($servers | Get-Unique)
-        Publish-VMs -HyperVServers ($servers | Get-Unique) -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -Destroy $Destroy -ReplaceUpFront $ReplaceUpFront
-        Clear-TempFiles -HyperVServers ($servers | Get-Unique)
+        Test-HyperVServers -HyperVServers ($servers | Get-Unique)
+        Publish-VMs -HyperVServers ($servers | Select-Object -ExpandProperty Name | Get-Unique) -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -Destroy $Destroy -ReplaceUpFront $ReplaceUpFront -ContinueOnError $ContinueOnError
+        Clear-TempFiles -HyperVServers ($servers | Select-Object -ExpandProperty Name | Get-Unique)
     }
 
 }

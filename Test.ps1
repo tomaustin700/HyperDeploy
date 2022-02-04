@@ -1,3 +1,3 @@
 Import-Module .\HyperDeploy.psm1 -Force
 
-Publish-HyperDeploy -DefinitionFile "C:\Users\TomA\source\repos\HyperDeploy\WinServer.json" -Replace  -Force -Verbose -ReplaceUpFront 
+Publish-HyperDeploy -DefinitionFile "C:\Users\TomA\source\repos\HyperDeploy\Structure.json" -Replace  -Force -ContinueOnError

@@ -90,43 +90,42 @@ function Initialize-VM {
 
 
         if ($script.EndsWith(".Set-Credential.ps1")) {
-            
+                
             Write-Verbose "Credential script detected, getting credentials"
-
+    
             $credObject = invoke-expression -Command $script
-
+    
             if ($credObject -and $credObject.GetType().Name -eq 'PSCredential') {
                 Write-Verbose "New credentials set" 
-
+    
                 $newCred = $credObject
             }
         }
         else {
-
+    
             Write-Verbose "Provisioning $VMName using $script" 
-
+    
             $InvokeParams = @{ 
                 FilePath     = $script
                 ComputerName = $ip[1]
             }
-           
+               
             if ($newCred) {
                 $InvokeParams.Add("Credential", $newCred)
             }
-            
+                
             invoke-command @InvokeParams
-    
-            if ($VM.Provisioning.RebootAfterEachScript) {
-                Stop-VM -Name  $VMName -ComputerName $HyperVServer.Name -Force
-                Start-VM -Name  $VMName -ComputerName $HyperVServer.Name
         
+            if ($VM.Provisioning.RebootAfterEachScript) {
+                Stop-VM -Name  $VMName -ComputerName $HyperVServer.Name -Force -ErrorAction Stop
+                Start-VM -Name  $VMName -ComputerName $HyperVServer.Name -ErrorAction Stop
+            
                 Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
             }
         }
-
+    }
         
 
-    }
-
-
 }
+
+
