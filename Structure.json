@@ -5,7 +5,7 @@
     "VMs": [
         {
             "Name": "TestVM",
-            "Replicas": 3,
+            "Replicas": 1,
             "ProcessorCount": 1,
             "MemoryStartupBytes": "1GB",
             "MemoryMaximumBytes": "4GB",

@@ -117,8 +117,8 @@ function Initialize-VM {
             invoke-command @InvokeParams
         
             if ($VM.Provisioning.RebootAfterEachScript) {
-                Stop-VM -Name  $VMName -ComputerName $HyperVServer.Name -Force
-                Start-VM -Name  $VMName -ComputerName $HyperVServer.Name
+                Stop-VM -Name  $VMName -ComputerName $HyperVServer.Name -Force -ErrorAction Stop
+                Start-VM -Name  $VMName -ComputerName $HyperVServer.Name -ErrorAction Stop
             
                 Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
             }

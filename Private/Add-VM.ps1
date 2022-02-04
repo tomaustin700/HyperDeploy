@@ -88,7 +88,7 @@ function Add-VM {
                                 Copy-Item "filesystem::$localPath" -Destination $tempGI
                             }
                         
-                            Copy-Item $tempGI -Destination "$using:diskPath\Disk.$extension"
+                            Copy-Item $tempGI -Destination "$using:diskPath\Disk.$extension" 
                     
                         }
                     }
