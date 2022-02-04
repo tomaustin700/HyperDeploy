@@ -180,6 +180,8 @@ function Add-VM {
     catch {
         if($ContinueOnError -eq $false) {
             throw
+        }else{
+            Publish-FailureMessage -VMName $VM.Name 
         }
     }
 

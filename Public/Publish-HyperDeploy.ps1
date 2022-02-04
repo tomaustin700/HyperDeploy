@@ -55,7 +55,7 @@ function Publish-HyperDeploy {
     #Requires -RunAsAdministrator
 
     try{
-        Get-VM
+        Get-VM | Out-Null
     }catch{
         write-host "Hyper-V module not installed, please install and try again"
         exit

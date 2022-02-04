@@ -13,27 +13,38 @@ function Confirm-ExistingVMRemovalAndAdd {
 
     )
 
-    $existingVM, $existingHypervisor = Assert-VMAlreadyExists -VM $VM -HyperVServers $HyperVServers
-    if ($existingVM -and $Replace -and !$Force) {
-        $name = $existingVM.Name
-        Write-Host "$name already exists, replace?" -ForegroundColor Red
-        $ReplaceConfirm = Read-Host "Press Y to confirm" 
-        if ($ReplaceConfirm.ToLower() -eq "y") {
-            Remove-VM  $VM.Name -ComputerName $existingHypervisor
-            Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -ContinueOnError $ContinueOnError
+    try {
+        $existingVM, $existingHypervisor = Assert-VMAlreadyExists -VM $VM -HyperVServers $HyperVServers
+        if ($existingVM -and $Replace -and !$Force) {
+            $name = $existingVM.Name
+            Write-Host "$name already exists, replace?" -ForegroundColor Red
+            $ReplaceConfirm = Read-Host "Press Y to confirm" 
+            if ($ReplaceConfirm.ToLower() -eq "y") {
+                Remove-VM  $VM.Name -ComputerName $existingHypervisor -ErrorAction Stop
+                Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -ContinueOnError $ContinueOnError
+            }
+            else {
+                throw
+            }
+        }
+        elseif ($existingVM -and $Replace -and $Force) {
+            Write-Verbose "Existing VM found, replacing."
+            Remove-VM $VM.Name -ComputerName $existingHypervisor -ErrorAction Stop
+            Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -ContinueOnError $ContinueOnError 
+        }
+        elseif (!$existingVM) {
+            Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions  -ContinueOnError $ContinueOnError
+        }
+    }
+    catch {
+        if ($ContinueOnError -eq $False) {
+            throw 
         }
         else {
-            throw
+            Publish-FailureMessage -VMName $VM.Name 
         }
     }
-    elseif ($existingVM -and $Replace -and $Force) {
-        Write-Verbose "Existing VM found, replacing."
-        Remove-VM $VM.Name -ComputerName $existingHypervisor
-        Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -ContinueOnError $ContinueOnError 
-    }
-    elseif (!$existingVM) {
-        Add-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions  -ContinueOnError $ContinueOnError
-    }
+    
 
 }
 
@@ -44,25 +55,36 @@ function Remove-ExistingVM {
         [VM]$VM,
         [string[]]$HyperVServers,
         [bool] $Replace,
-        [bool] $Force
+        [bool] $Force,
+        [bool] $ContinueOnError
     )
 
-    $existingVM, $existingHypervisor = Assert-VMAlreadyExists -VM $VM -HyperVServers $HyperVServers
-    if ($existingVM -and $Replace -and !$Force) {
-        $name = $existingVM.Name
-        Write-Host "$name found, remove?" -ForegroundColor Red
-        $ReplaceConfirm = Read-Host "Press Y to confirm" 
-        if ($ReplaceConfirm.ToLower() -eq "y") {
-            Write-Verbose "Existing VM found, removing"
-            Remove-VM  $VM.Name -ComputerName $existingHypervisor
+    try {
+        $existingVM, $existingHypervisor = Assert-VMAlreadyExists -VM $VM -HyperVServers $HyperVServers
+        if ($existingVM -and $Replace -and !$Force) {
+            $name = $existingVM.Name
+            Write-Host "$name found, remove?" -ForegroundColor Red
+            $ReplaceConfirm = Read-Host "Press Y to confirm" 
+            if ($ReplaceConfirm.ToLower() -eq "y") {
+                Write-Verbose "Existing VM found, removing"
+                Remove-VM  $VM.Name -ComputerName $existingHypervisor -ErrorAction Stop
+            }
+            else {
+                throw
+            }
         }
-        else {
-            throw
+        elseif ($existingVM -and $Replace -and $Force) {
+            Write-Verbose "Existing VM found, removing"
+            Remove-VM $VM.Name -ComputerName $existingHypervisor  -ErrorAction Stop
         }
     }
-    elseif ($existingVM -and $Replace -and $Force) {
-        Write-Verbose "Existing VM found, removing"
-        Remove-VM $VM.Name -ComputerName $existingHypervisor
+    catch {
+        if ($ContinueOnError -eq $False) {
+            throw 
+        }
+        else {
+            Publish-FailureMessage -VMName $VM.Name 
+        }
     }
 
 }
@@ -172,13 +194,14 @@ function Publish-VMs {
 
                             $last = $VMList[-1]
 
-                            $iteration = ([int]($last.Name -replace '\D+(\d+)','$1')) +1 
+                            $iteration = ([int]($last.Name -replace '\D+(\d+)', '$1')) + 1 
 
-                            if ($newVm.Name = "$vmReplicaName$iteration"){
+                            if ($newVm.Name = "$vmReplicaName$iteration") {
                                 #Skip is last to be created
                                 $iteration ++
                                 $newVm.Name = "$vmReplicaName$iteration"
-                            }else{
+                            }
+                            else {
                                 $newVm.Name = "$vmReplicaName$iteration"
 
                             }
@@ -191,14 +214,14 @@ function Publish-VMs {
         }
     }
 
-    write-output $VMList
+    #write-output $VMList
 
     if (!$Destroy) {
 
-        if ($ReplaceUpFront){
+        if ($ReplaceUpFront) {
             Write-Host "Removing existing VM's up front"
-            foreach($vm in $VMList) {
-                Remove-ExistingVM  -VM $vm -HyperVServers $HyperVServers  -Replace $Replace -Force $Force 
+            foreach ($vm in $VMList) {
+                Remove-ExistingVM  -VM $vm -HyperVServers $HyperVServers  -Replace $Replace -Force $Force -ContinueOnError $ContinueOnError
             }
         }
 
@@ -219,6 +242,7 @@ function Publish-VMs {
             )
 
             . .\Private\Publish-VMs.ps1
+            . .\Private\Publish-FailureMessage.ps1
             . .\Private\Add-VM.ps1
             . .\Private\Assert-VMAlreadyExists.ps1
             . .\Private\Classes.ps1
@@ -259,7 +283,7 @@ function Publish-VMs {
             Get-Job | Remove-Job
         }
 
-        Write-Verbose "Virtual Machines Added"
+        Write-Host "Virtual Machines Added" -ForegroundColor Green
 
     }
     else {
@@ -287,7 +311,7 @@ function Publish-VMs {
 
             $existingVM, $existingHypervisor = Assert-VMAlreadyExists -VM $vm -HyperVServers $HyperVServers
             if ($existingVM) {
-                Remove-VM  $vm.Name -ComputerName $existingHypervisor
+                Remove-VM  $vm.Name -ComputerName $existingHypervisor 
             }
         }
 

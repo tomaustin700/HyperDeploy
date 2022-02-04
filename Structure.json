@@ -5,14 +5,11 @@
     "VMs": [
         {
             "Name": "TestVM",
-            "Replicas": 1,
+            "Replicas": 3,
             "ProcessorCount": 1,
             "MemoryStartupBytes": "1GB",
             "MemoryMaximumBytes": "4GB",
-            "CheckpointType": "Disabled",
-            "SkipNames": [
-                "TestVM3"
-            ]
+            "CheckpointType": "Disabled"
         }
     ]
 }
