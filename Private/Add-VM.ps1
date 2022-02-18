@@ -139,38 +139,38 @@ function Add-VM {
 
             Add-VMHardDiskDrive @AddVMHardDiskDriveParams -ErrorAction Stop
         }
-    }
+    
 
-    if ($DeploymentOptions -and $DeploymentOptions.StartAfterCreation) {
+        if ($DeploymentOptions -and $DeploymentOptions.StartAfterCreation) {
 
-        Write-Verbose "Starting VM"
+            Write-Verbose "Starting VM"
 
-        $StartVMParams = @{ 
-            Name         = $VM.Name
-            ComputerName = $HyperVServer.Name
-        }
-
-        Start-VM @StartVMParams
-
-        if ($VM.Provisioning) {
-
-            $InitializeVMParams = @{ 
-                VM           = $VM
-                HyperVServer = $HyperVServer
+            $StartVMParams = @{ 
+                Name         = $VM.Name
+                ComputerName = $HyperVServer.Name
             }
 
-            Initialize-VM @InitializeVMParams  
+            Start-VM @StartVMParams
+
+            if ($VM.Provisioning) {
+
+                $InitializeVMParams = @{ 
+                    VM           = $VM
+                    HyperVServer = $HyperVServer
+                }
+
+                Initialize-VM @InitializeVMParams  
+            }
+        }
+
+    }
+    catch {
+        if ($ContinueOnError -eq $false) {
+            throw
+        }
+        else {
+            Publish-FailureMessage -VMName $VM.Name 
         }
     }
-
-}
-catch {
-    if ($ContinueOnError -eq $false) {
-        throw
-    }
-    else {
-        Publish-FailureMessage -VMName $VM.Name 
-    }
-}
 
 }

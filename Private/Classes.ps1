@@ -9,6 +9,7 @@ class HyperVServer {
 
 class Provisioning {
     [bool]$RebootAfterEachScript
+    [bool]$RebootAfterLastScript
     [string[]]$Scripts
 }
 
