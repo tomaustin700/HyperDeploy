@@ -86,8 +86,10 @@ function Initialize-VM {
 
     $newCred = $null
 
+    $scriptCount = 0
     foreach ($script in $VM.Provisioning.Scripts) {
 
+        $scriptCount++
 
         if ($script.EndsWith(".Set-Credential.ps1")) {
                 
@@ -115,14 +117,22 @@ function Initialize-VM {
             }
                 
             invoke-command @InvokeParams
+
+            $lastScript = $scriptCount -eq $VM.Provisioning.Scripts.Count
         
-            if ($VM.Provisioning.RebootAfterEachScript) {
-                Stop-VM -Name  $VMName -ComputerName $HyperVServer.Name -Force -ErrorAction Stop
-                Start-VM -Name  $VMName -ComputerName $HyperVServer.Name -ErrorAction Stop
-            
-                Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
+            if ($VM.Provisioning.RebootAfterEachScript ) {
+
+                if (($VM.Provisioning.RebootAfterLastScript -eq $true) -or ($VM.Provisioning.RebootAfterLastScript -eq $false -and $lastScript -eq $false)) {
+                    Stop-VM -Name  $VMName -ComputerName $HyperVServer.Name -Force -ErrorAction Stop
+                    Start-VM -Name  $VMName -ComputerName $HyperVServer.Name -ErrorAction Stop
+                
+                    Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
+                }
+
+                
             }
         }
+
     }
         
 
