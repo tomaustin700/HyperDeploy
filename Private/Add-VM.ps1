@@ -101,88 +101,76 @@ function Add-VM {
                     $extension = $HyperVServer.GoldenImageExtension
                     $tempGI = "$temp\HyperDeployGoldenImage.$extension"
 
-                    if ($HyperVServer.GoldenImagePath.Contains("drive.google")) {
-                        $p = & { python -V } 2>&1
-
-                        if ($p -is [System.Management.Automation.ErrorRecord]) {
-                            throw "Google Drive file download requires Python and Pip to be installed"
-                        }
-                        else {
-                            pip install gdown
-                            Set-Location $temp
-                            gdrive $HyperVServer.GoldenImagePath -O "HyperDeployGoldenImage.$extension"
-                        }
-
-                    }
-                    else {
-                        Invoke-WebRequest -Uri $HyperVServer.GoldenImagePath -OutFile $tempGI
-                    }
-                }
-                else {
-                    Invoke-Command   -ComputerName $HyperVServer.Name { 
-                        $localPath = $using:path
-                        if (!(Test-Path $localPath)) {
-                            throw "$localPath does not exist"
-                        }
-
-                        $extension = $localPath.Split('.')[-1]
-
-                        Copy-Item $localPath -Destination "$using:diskPath\Disk.$extension"
-                    }
-                }
+                    
+                    Invoke-WebRequest -Uri $HyperVServer.GoldenImagePath -OutFile $tempGI -UseBasicParsing
+                }                
             }
-            elseif ($VM.NewVMDiskSizeBytes) {
+            else {
+                Invoke-Command   -ComputerName $HyperVServer.Name { 
+                    $localPath = $using:path
+                    if (!(Test-Path $localPath)) {
+                        throw "$localPath does not exist"
+                    }
 
-                $NewVHDParams = @{ 
-                    Path         = "$diskPath\Disk.vhdx"
-                    SizeBytes    = [int64][scriptblock]::Create($VM.NewVMDiskSizeBytes).Invoke()[0]
-                    ComputerName = $HyperVServer.Name
+                    $extension = $localPath.Split('.')[-1]
+
+                    Copy-Item $localPath -Destination "$using:diskPath\Disk.$extension"
                 }
-                New-VHD @NewVHDParams -ErrorAction Stop
-            }
-
-            Invoke-Command  -ComputerName $HyperVServer.Name { 
-                $disk = Get-ChildItem -Path $using:diskPath -Filter "Disk.*" -Recurse -Force 
-                $name = $using:VM.Name
-
-                $AddVMHardDiskDriveParams = @{ 
-                    Path   = $disk[0].FullName
-                    VMName = $name
-                }
-
-                Add-VMHardDiskDrive @AddVMHardDiskDriveParams -ErrorAction Stop
             }
         }
+        elseif ($VM.NewVMDiskSizeBytes) {
 
-        if ($DeploymentOptions -and $DeploymentOptions.StartAfterCreation) {
-
-            Write-Verbose "Starting VM"
-
-            $StartVMParams = @{ 
-                Name         = $VM.Name
+            $NewVHDParams = @{ 
+                Path         = "$diskPath\Disk.vhdx"
+                SizeBytes    = [int64][scriptblock]::Create($VM.NewVMDiskSizeBytes).Invoke()[0]
                 ComputerName = $HyperVServer.Name
             }
+            New-VHD @NewVHDParams -ErrorAction Stop
+        }
 
-            Start-VM @StartVMParams
+        Invoke-Command  -ComputerName $HyperVServer.Name { 
+            $disk = Get-ChildItem -Path $using:diskPath -Filter "Disk.*" -Recurse -Force 
+            $name = $using:VM.Name
 
-            if ($VM.Provisioning) {
-
-                $InitializeVMParams = @{ 
-                    VM           = $VM
-                    HyperVServer = $HyperVServer
-                }
-
-                Initialize-VM @InitializeVMParams  
+            $AddVMHardDiskDriveParams = @{ 
+                Path   = $disk[0].FullName
+                VMName = $name
             }
+
+            Add-VMHardDiskDrive @AddVMHardDiskDriveParams -ErrorAction Stop
+        }
+    }
+
+    if ($DeploymentOptions -and $DeploymentOptions.StartAfterCreation) {
+
+        Write-Verbose "Starting VM"
+
+        $StartVMParams = @{ 
+            Name         = $VM.Name
+            ComputerName = $HyperVServer.Name
         }
 
-    }
-    catch {
-        if($ContinueOnError -eq $false) {
-            throw
-        }else{
-            Publish-FailureMessage -VMName $VM.Name 
+        Start-VM @StartVMParams
+
+        if ($VM.Provisioning) {
+
+            $InitializeVMParams = @{ 
+                VM           = $VM
+                HyperVServer = $HyperVServer
+            }
+
+            Initialize-VM @InitializeVMParams  
         }
     }
+
+}
+catch {
+    if ($ContinueOnError -eq $false) {
+        throw
+    }
+    else {
+        Publish-FailureMessage -VMName $VM.Name 
+    }
+}
 
 }
