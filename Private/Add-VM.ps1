@@ -103,7 +103,19 @@ function Add-VM {
 
                     
                     Invoke-WebRequest -Uri $HyperVServer.GoldenImagePath -OutFile $tempGI -UseBasicParsing
-                }                
+                } 
+                else {
+                    Invoke-Command   -ComputerName $HyperVServer.Name { 
+                        $localPath = $using:path
+                        if (!(Test-Path $localPath)) {
+                            throw "$localPath does not exist"
+                        }
+
+                        $extension = $localPath.Split('.')[-1]
+
+                        Copy-Item $localPath -Destination "$using:diskPath\Disk.$extension"
+                    }
+                }               
             }
             else {
                 Invoke-Command   -ComputerName $HyperVServer.Name { 
