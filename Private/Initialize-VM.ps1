@@ -105,7 +105,8 @@ function Initialize-VM {
         }
         elseif ($script.EndsWith(".Validate.ps1")) {
 
-            
+            Write-Verbose "Validating $VMName using $script" 
+
             $InvokeParams = @{ 
                 FilePath     = $script
                 ComputerName = $ip[1]
@@ -115,7 +116,8 @@ function Initialize-VM {
                 $InvokeParams.Add("Credential", $newCred)
             }
             try {
-                invoke-command @InvokeParams -ErrorAction Stop      
+                invoke-command @InvokeParams -ErrorAction Stop   
+                Write-Verbose "Validation script $script passed"
             }
             catch {
                 write-host "Validation script failed"

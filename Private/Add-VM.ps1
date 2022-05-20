@@ -76,6 +76,15 @@ function  Setup-VM {
             else {
                 Remove-VM  $VM.Name -ComputerName $HyperVServer.Name -ErrorAction Stop
                 Build-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -ContinueOnError $ContinueOnError
+                
+                Write-Verbose "Starting VM"
+
+                $StartVMParams = @{ 
+                    Name         = $VM.Name
+                    ComputerName = $HyperVServer.Name
+                }
+
+                Start-VM @StartVMParams
                 Setup-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -ContinueOnError $ContinueOnError
                 
             }
@@ -118,7 +127,7 @@ function Build-VM {
     }
 
     New-VM  @NewVMParams -ErrorAction Stop | out-null
-    Set-VM @SetVMParams -ErrorAction Stop
+    Set-VM @SetVMParams -ErrorAction Stop | out-null
 
     if ($HyperVServer.VMHardDiskPath) {
 
