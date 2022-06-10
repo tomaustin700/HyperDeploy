@@ -108,10 +108,10 @@ Example definition file:
     }
 ```
 Deployment options are global settings which rule over all deployments.
-### StartAfterCreation
+### **StartAfterCreation**
 If set to true HyperDeploy will start a VM immediately after the VM has been created. This must be set to true to use the provisioning features of HyperDeploy (discussed below)
 
-### Parallel
+### **Parallel**
 If set to true HyperDeploy will attempt to create VM's and provision in parallel to speed up deployment. Up to 5 VM's will be created/provisioned in parallel. This is an experamental feature and has not been thoroughly tested so use with care.
 
 ## VMs
@@ -158,35 +158,38 @@ VMS is an array of virtual machines that you want to create/destroy using HyperD
 
 ```
 
-### Name
+### **Name**
 Name of VM you want to create/destroy using HyperDeploy, if `Replicas` is also specified then a number will be suffixed onto the name for each replica created.
 
-### ProcessorCount
+### **ProcessorCount**
 Specifies how many virtual processors the VM should be created with.
 
-### MemoryStartupBytes
+### **MemoryStartupBytes**
 Specifies how much memory the VM should be assigned at startup.
 
-### MemoryMaximumBytes
+### **MemoryMaximumBytes**
 Specifies the maximum memory that can be assigned to the VM.
 
-### CheckpointType
+### **CheckpointType**
 Allows setting the VMs checkpoint setting within Hyper-V, for options see below:
 
 The acceptable values for this parameter are:
 
 Disabled. Block creation of checkpoints.
+
 Standard. Create standard checkpoints.
+
 Production. Create production checkpoints if supported by guest operating system. Otherwise, create standard checkpoints.
+
 ProductionOnly. Create production checkpoints if supported by guest operating system. Otherwise, the operation fails.
 
-### Replicas
+### **Replicas**
 If set HyperDeploy will create replicas of the VM, this is useful when you have a golden image and want to deploy x amount of replicas. For each replica a number will be suffixed onto the name value. Replicas will be load balanced accross the hosts specified in the `HyperVServers` array (see below).
 
-### ReplicaStartIndex
+### **ReplicaStartIndex**
 Used in conjunction with `Replicas`, dictates what the starting replica number should be.
 
-### SkipNames
+### **SkipNames**
 Use this array to specify any VM's you want to be skipped over when creating replicas. For example if `Name` is set to `VM` and  `Replicas` is set to 3 the following VMs would be created: VM1, VM2 and VM3. If `SkipNames` has `VM2` specified in it like so:
 ```json
 "SkipNames": [
@@ -195,7 +198,7 @@ Use this array to specify any VM's you want to be skipped over when creating rep
 ```
 The VMs created would be VM`, VM3 and VM4.
 
-### HyperVServers
+### **HyperVServers**
 This array contains the details about each Hyper-V host you want to deploy VM's to.
 ```json
 "HyperVServers": [
@@ -203,7 +206,52 @@ This array contains the details about each Hyper-V host you want to deploy VM's 
                     "Name": "Host1",
                     "SwitchName": "VM Virtual Switch",
                     "GoldenImagePath": "A:\\goldenimage.vhdx",
-                    "VMHardDiskPath": "A:\\Virtual Hard Disks"
+                    "VMHardDiskPath": "A:\\Virtual Hard Disks",
+                    "MaxReplicas" : 20
                 }
             ]
 ```
+#### **Name**
+Name of the Hyper-V host you want to deploy VM's to. The host much have WinRM enabled and allow remote connections.
+
+#### **SwitchName** 
+Name of the Hyper-V Virtual Switch you want to assign to the VM
+
+#### **GoldenImagePath**
+Used in conjuction with VM Replica setting. If specified a copy of the golden image specified will be taken and attached as a virtual hard disk to the VM
+
+#### **VMHardDiskPath**
+Location where you want to store the VM hard disk on the host server.
+
+#### **MaxReplicas**
+Maximum amount on replicas to assign to the host if `Replicas` are in use.
+
+### **Provisioning**
+Provisioning allows you to execute Powershell scripts against VM's created by HyperDeploy during the creation process.
+```json
+"Provisioning": {
+                "RebootAfterEachScript": true,
+                "RebootAfterLastScript": true,
+                "Scripts": [
+                    "C:\\HyperDeployScripts\\Script1.Set-Credential.ps1",
+                    "C:\\HyperDeployScripts\\Script2.ps1"
+                ]
+            }
+```
+#### **RebootAfterEachScript**
+If true after each script is ran the VM will be rebooted. Useful when your scripts require a reboot to apply such as joining a domain.
+
+#### **RebootAfterLastScript**
+If true will reboot after the last provisioning script is ran, similar to
+
+### **Scripts**
+Array of scripts you want to execute against the VM. These are executed over WinRM. In order for communication to be established over WinRM you need to set the credentials for HyperDeploy to use, this is done using credential scripts. Credential scripts end in .Set-Credential.ps1 and should return a `pscredential` object. See below for an example credential script
+```powershell
+[string]$userName = 'user'
+[string]$userPassword = 'password'
+[securestring]$secStringPassword = ConvertTo-SecureString $userPassword -AsPlainText -Force
+[pscredential]$credOject = New-Object System.Management.Automation.PSCredential ($userName, $secStringPassword)
+
+return $credOject
+```
+I would highly recommend you don't store credentials within a Powershell script and instead use something like a replace tokens task/script within a CI/CD system.
