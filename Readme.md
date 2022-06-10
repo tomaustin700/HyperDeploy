@@ -9,7 +9,7 @@ HyperDeploy is not currently cross-platform and will only run on Windows, it can
 Install-Module -Name HyperDeploy
 ```
 
-## Usage
+# Usage
 
 The main function provided by HyperDeploy is `Publish-HyperDeploy` which has the following parameters:
 
@@ -49,3 +49,55 @@ If replace is set then remove all VM's specified within the definition file in o
 Publish-HyperDeploy -DefinitionFile "C:\definition.json" -ContinueOnError
 ```
 Stops HyperDeploy from aborting if an issue is encountered during execution.
+
+# Definition File
+
+Example definition file:
+```json
+{
+    "DeploymentOptions": {
+        "StartAfterCreation": true,
+        "Parallel": false
+    },
+    "VMs": [
+        {
+            "Name": "VM",
+            "ProcessorCount": 8,
+            "MemoryStartupBytes": "1GB",
+            "MemoryMaximumBytes": "4GB",
+            "CheckpointType": "Disabled",
+            "Replicas": 50,
+            "ReplicaStartIndex" : 5,
+            "SkipNames": [
+                "VM10"
+            ],
+            "HyperVServers": [
+                {
+                    "Name": "Host1",
+                    "SwitchName": "VM Virtual Switch",
+                    "GoldenImagePath": "A:\\goldenimage.vhdx",
+                    "VMHardDiskPath": "A:\\Virtual Hard Disks"
+                },
+                {
+                    "Name": "Host2",
+                    "SwitchName": "VM Virtual Switch",
+                    "GoldenImagePath": "A:\\goldenimage.vhdx",
+                    "VMHardDiskPath": "A:\\Virtual Hard Disks",
+                    "MaxReplicas" : 20
+                }
+            ],
+            "Provisioning": {
+                "RebootAfterEachScript": true,
+                "RebootAfterLastScript": true,
+                "RebuildOnValidationFailure": true,
+                "Scripts": [
+                    "C:\\HyperDeployScripts\\Script1.Set-Credential.ps1",
+                    "C:\\HyperDeployScripts\\Script2.ps1"
+                ]
+            }
+        }
+    ]
+}
+```
+
+## DeploymentOptions
