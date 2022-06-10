@@ -103,6 +103,34 @@ function Initialize-VM {
                 $newCred = $credObject
             }
         }
+        elseif ($script.EndsWith(".Validate.ps1")) {
+
+            Write-Verbose "Validating $VMName using $script" 
+
+            $InvokeParams = @{ 
+                FilePath     = $script
+                ComputerName = $ip[1]
+            }
+               
+            if ($newCred) {
+                $InvokeParams.Add("Credential", $newCred)
+            }
+            try {
+                invoke-command @InvokeParams -ErrorAction Stop   
+                Write-Verbose "Validation script $script passed"
+            }
+            catch {
+                write-host "Validation script failed"
+                if ($VM.Provisioning.RebuildOnValidationFailure -eq $true) {
+                    throw "$VMName failed validation process - REBUILD NEEDED"
+
+                }
+                else {
+                    throw "$VMName failed validation process"
+                }
+
+            }
+        }
         else {
     
             Write-Verbose "Provisioning $VMName using $script" 

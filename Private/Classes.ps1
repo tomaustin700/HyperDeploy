@@ -10,6 +10,7 @@ class HyperVServer {
 class Provisioning {
     [bool]$RebootAfterEachScript
     [bool]$RebootAfterLastScript
+    [bool]$RebuildOnValidationFailure
     [string[]]$Scripts
 }
 
