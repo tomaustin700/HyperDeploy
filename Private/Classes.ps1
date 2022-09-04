@@ -14,6 +14,10 @@ class Provisioning {
     [string[]]$Scripts
 }
 
+class PostCreate {
+    [string[]]$Scripts
+}
+
 class VM:System.ICloneable {
 
     [Object] Clone () {
@@ -33,6 +37,7 @@ class VM:System.ICloneable {
     [string]$UNCCredentialScript
     [string]$CheckpointType
     [string]$NewVMDiskSizeBytes
+    [PostCreate]$PostCreate
     [Provisioning]$Provisioning
     [HyperVServer[]]$HyperVServers
     [guid]$ReplicaGuid

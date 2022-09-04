@@ -1,3 +1,3 @@
 Import-Module .\HyperDeploy.psm1 -Force
 
-Publish-HyperDeploy -DefinitionFile "C:\Users\TomA\source\repos\HyperDeploy\Structure2.json" -Replace  -Force -ContinueOnError -Verbose
+Publish-HyperDeploy -DefinitionFile "C:\Users\Tom\source\repos\HyperDeploy\Structure.json"  -Replace -Force

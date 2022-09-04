@@ -62,6 +62,22 @@ function Wait-ForResponsiveVM {
     return $IP
 }
 
+function PostCreate-VM {
+    Param
+    (
+        [Parameter(Mandatory)]
+        [VM]$VM,
+        [Parameter(Mandatory)]
+        [HyperVServer]$HyperVServer
+
+    )
+
+    foreach ($script in $VM.PostCreate.Scripts) {
+        Write-Verbose "Running Post Create Script $script"
+        Invoke-Command -ComputerName $HyperVServer.Name -FilePath $script -ArgumentList $VM.Name
+    }
+}
+
 function Initialize-VM {
     Param
     (
@@ -105,8 +121,7 @@ function Initialize-VM {
         }
         elseif ($script.EndsWith(".Validate.ps1")) {
 
-            Write-Verbose "Validating $VMName using $script" 
-
+            
             $InvokeParams = @{ 
                 FilePath     = $script
                 ComputerName = $ip[1]
@@ -116,8 +131,7 @@ function Initialize-VM {
                 $InvokeParams.Add("Credential", $newCred)
             }
             try {
-                invoke-command @InvokeParams -ErrorAction Stop   
-                Write-Verbose "Validation script $script passed"
+                invoke-command @InvokeParams -ErrorAction Stop      
             }
             catch {
                 write-host "Validation script failed"
@@ -165,5 +179,7 @@ function Initialize-VM {
         
 
 }
+
+
 
 

@@ -86,6 +86,11 @@ Example definition file:
                     "MaxReplicas" : 20
                 }
             ],
+            "PostCreate":{
+                "Scripts":[
+                    "C:\\HyperDeployScripts\\SetVLANS.ps1"
+                ]
+            },
             "Provisioning": {
                 "RebootAfterEachScript": true,
                 "RebootAfterLastScript": true,
@@ -145,6 +150,11 @@ VMS is an array of virtual machines that you want to create/destroy using HyperD
                     "MaxReplicas" : 20
                 }
             ],
+            "PostCreate":{
+                "Scripts":[
+                    "C:\\HyperDeployScripts\\SetVLANS.ps1"
+                ]
+            },
             "Provisioning": {
                 "RebootAfterEachScript": true,
                 "RebootAfterLastScript": true,
@@ -225,6 +235,23 @@ Location where you want to store the VM hard disk on the host server.
 
 #### **MaxReplicas**
 Maximum amount on replicas to assign to the host if `Replicas` are in use.
+
+### **PostCreate**
+Post create allows you to execute scripts against the created VM, the main use of these scripts is to set additional Hyper V configuration settings that HyperDeploy cannot do natively such as assign a VLAN Identifier or set VM Firmware configuration.
+```json
+"PostCreate":{
+                "Scripts":[
+                    "C:\\HyperDeployScripts\\SetVLANS.ps1"
+                ]
+            }
+```
+The name of the created VM is passed as an argument to any specified scripts. An example Post Create script may look like the following:
+
+```powershell
+param($name)
+
+Set-VMNetworkAdapterVlan -VMName $name -Access -VlanId 121
+```
 
 ### **Provisioning**
 Provisioning allows you to execute Powershell scripts against VM's created by HyperDeploy during the creation process.

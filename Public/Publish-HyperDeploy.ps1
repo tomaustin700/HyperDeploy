@@ -75,14 +75,14 @@ function Publish-HyperDeploy {
 
                 $vm.HyperVServers = @()
                 $server = New-Object HyperVServer
-                $server.Name = $env:computername
+                $server.Name = "localhost"
                 $vm.HyperVServers += $server
             }
 
             foreach ($server in $vm.HyperVServers) {
                 
                 if ($null -eq $server.Name){
-                    $server.Name = $env:computername
+                    $server.Name = "localhost"
                 }
                 
                 $servers += $server

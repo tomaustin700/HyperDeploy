@@ -16,6 +16,10 @@ function Add-VM {
         
         
         Build-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -ContinueOnError $ContinueOnError
+
+        if ($VM.PostCreate){
+            PostCreate-VM -VM $VM -HyperVServer $HyperVServer
+        }
         
         if ($DeploymentOptions -and $DeploymentOptions.StartAfterCreation) {
 
@@ -62,7 +66,7 @@ function  Setup-VM {
         HyperVServer = $HyperVServer
     }
 
-    try {
+    try { 
         Initialize-VM @InitializeVMParams  
     }
     catch {
@@ -222,7 +226,7 @@ function Build-VM {
         }
     }
     elseif ($VM.NewVMDiskSizeBytes) {
-
+        $diskPath = "C:\Users\Public\Documents\Hyper-V\Virtual Hard Disks\$($VM.Name)"
         $NewVHDParams = @{ 
             Path         = "$diskPath\Disk.vhdx"
             SizeBytes    = [int64][scriptblock]::Create($VM.NewVMDiskSizeBytes).Invoke()[0]
@@ -231,16 +235,18 @@ function Build-VM {
         New-VHD @NewVHDParams -ErrorAction Stop
     }
 
-    Invoke-Command  -ComputerName $HyperVServer.Name { 
-        $disk = Get-ChildItem -Path $using:diskPath -Filter "Disk.*" -Recurse -Force 
-        $name = $using:VM.Name
+    if ($null -ne $diskPath) {
+        Invoke-Command  -ComputerName $HyperVServer.Name { 
+            $disk = Get-ChildItem -Path $using:diskPath -Filter "Disk.*" -Recurse -Force 
+            $name = $using:VM.Name
 
-        $AddVMHardDiskDriveParams = @{ 
-            Path   = $disk[0].FullName
-            VMName = $name
+            $AddVMHardDiskDriveParams = @{ 
+                Path   = $disk[0].FullName
+                VMName = $name
+            }
+
+            Add-VMHardDiskDrive @AddVMHardDiskDriveParams -ErrorAction Stop
         }
-
-        Add-VMHardDiskDrive @AddVMHardDiskDriveParams -ErrorAction Stop
     }
 
 }

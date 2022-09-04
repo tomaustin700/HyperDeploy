@@ -12,7 +12,7 @@
 RootModule = 'HyperDeploy.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.2'
+ModuleVersion = '0.3.0'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -27,7 +27,7 @@ Author = 'Tom Austin'
 CompanyName = 'Unknown'
 
 # Copyright statement for this module
-Copyright = '(c) 2021 Tom Austin. All rights reserved.'
+Copyright = '(c) 2022 Tom Austin. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Infrastructure as Code tool for Microsoft Hyper-V'
