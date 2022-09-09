@@ -269,7 +269,7 @@ Provisioning allows you to execute Powershell scripts against VM's created by Hy
 If true after each script is ran the VM will be rebooted. Useful when your scripts require a reboot to apply such as joining a domain.
 
 #### **RebootAfterLastScript**
-If true will reboot after the last provisioning script is ran, similar to
+If true will reboot after the last provisioning script is ran, default value is `true`
 
 ### **Scripts**
 Array of scripts you want to execute against the VM. These are executed over WinRM. In order for communication to be established over WinRM you need to set the credentials for HyperDeploy to use, this is done using credential scripts. Credential scripts end in .Set-Credential.ps1 and should return a `pscredential` object. See below for an example credential script

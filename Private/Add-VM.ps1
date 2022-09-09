@@ -17,7 +17,7 @@ function Add-VM {
         
         Build-VM -VM $VM -HyperVServer $HyperVServer -DeploymentOptions $DeploymentOptions -ContinueOnError $ContinueOnError
 
-        if ($VM.PostCreate){
+        if ($VM.PostCreate) {
             PostCreate-VM -VM $VM -HyperVServer $HyperVServer
         }
         
@@ -236,17 +236,19 @@ function Build-VM {
     }
 
     if ($null -ne $diskPath) {
-        Invoke-Command  -ComputerName $HyperVServer.Name { 
+        
+        $disk = Invoke-Command  -ComputerName $HyperVServer.Name { 
             $disk = Get-ChildItem -Path $using:diskPath -Filter "Disk.*" -Recurse -Force 
-            $name = $using:VM.Name
 
-            $AddVMHardDiskDriveParams = @{ 
-                Path   = $disk[0].FullName
-                VMName = $name
-            }
-
-            Add-VMHardDiskDrive @AddVMHardDiskDriveParams -ErrorAction Stop
+            $disk[0].FullName
         }
+
+        $AddVMHardDiskDriveParams = @{ 
+            Path         = $disk
+            VMName       = $VM.Name
+            ComputerName = $HyperVServer.Name
+        }
+        Add-VMHardDiskDrive @AddVMHardDiskDriveParams -ErrorAction Stop
     }
 
 }
