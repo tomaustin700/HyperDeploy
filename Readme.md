@@ -95,6 +95,7 @@ Example definition file:
                 "RebootAfterEachScript": true,
                 "RebootAfterLastScript": true,
                 "RebuildOnValidationFailure": true,
+                "RebuildOnProvisionFailure": true,
                 "Scripts": [
                     "C:\\HyperDeployScripts\\Script1.Set-Credential.ps1",
                     "C:\\HyperDeployScripts\\Script2.ps1"
@@ -159,6 +160,7 @@ VMS is an array of virtual machines that you want to create/destroy using HyperD
                 "RebootAfterEachScript": true,
                 "RebootAfterLastScript": true,
                 "RebuildOnValidationFailure": true,
+                "RebuildOnProvisionFailure": true,
                 "Scripts": [
                     "C:\\HyperDeployScripts\\Script1.Set-Credential.ps1",
                     "C:\\HyperDeployScripts\\Script2.ps1"
@@ -259,6 +261,7 @@ Provisioning allows you to execute Powershell scripts against VM's created by Hy
 "Provisioning": {
                 "RebootAfterEachScript": true,
                 "RebootAfterLastScript": true,
+                "RebuildOnProvisionFailure": true,
                 "Scripts": [
                     "C:\\HyperDeployScripts\\Script1.Set-Credential.ps1",
                     "C:\\HyperDeployScripts\\Script2.ps1"
@@ -270,6 +273,9 @@ If true after each script is ran the VM will be rebooted. Useful when your scrip
 
 #### **RebootAfterLastScript**
 If true will reboot after the last provisioning script is ran, default value is `true`
+
+#### **RebuildOnProvisionFailure**
+If true will recreate the VM if any error is detected as part of the priovisioning process, this will be retried up to 3 times.
 
 ### **Scripts**
 Array of scripts you want to execute against the VM. These are executed over WinRM. In order for communication to be established over WinRM you need to set the credentials for HyperDeploy to use, this is done using credential scripts. Credential scripts end in .Set-Credential.ps1 and should return a `pscredential` object. See below for an example credential script

@@ -147,32 +147,45 @@ function Initialize-VM {
         }
         else {
     
-            Write-Verbose "Provisioning $VMName using $script" 
+            try {
+                Write-Verbose "Provisioning $VMName using $script" 
     
-            $InvokeParams = @{ 
-                FilePath     = $script
-                ComputerName = $ip[1]
-            }
-               
-            if ($newCred) {
-                $InvokeParams.Add("Credential", $newCred)
-            }
-                
-            invoke-command @InvokeParams
-
-            $lastScript = $scriptCount -eq $VM.Provisioning.Scripts.Count
-        
-            if ($VM.Provisioning.RebootAfterEachScript ) {
-
-                if (($VM.Provisioning.RebootAfterLastScript -eq $true) -or ($VM.Provisioning.RebootAfterLastScript -eq $false -and $lastScript -eq $false)) {
-                    Stop-VM -Name  $VMName -ComputerName $HyperVServer.Name -Force -ErrorAction Stop
-                    Start-VM -Name  $VMName -ComputerName $HyperVServer.Name -ErrorAction Stop
-                
-                    Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
+                $InvokeParams = @{ 
+                    FilePath     = $script
+                    ComputerName = $ip[1]
                 }
+               
+                if ($newCred) {
+                    $InvokeParams.Add("Credential", $newCred)
+                }
+                
+                invoke-command @InvokeParams
+
+                $lastScript = $scriptCount -eq $VM.Provisioning.Scripts.Count
+        
+                if ($VM.Provisioning.RebootAfterEachScript ) {
+
+                    if (($VM.Provisioning.RebootAfterLastScript -eq $true) -or ($VM.Provisioning.RebootAfterLastScript -eq $false -and $lastScript -eq $false)) {
+                        Stop-VM -Name  $VMName -ComputerName $HyperVServer.Name -Force -ErrorAction Stop
+                        Start-VM -Name  $VMName -ComputerName $HyperVServer.Name -ErrorAction Stop
+                
+                        Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
+                    }
 
                 
+                }
             }
+            catch {
+                write-host "Provision failed"
+                if ($VM.Provisioning.$RebuildOnProvisionFailure -eq $true) {
+                    throw "$VMName failed provision process - REBUILD NEEDED"
+
+                }
+                else {
+                    throw "$VMName failed provision process"
+                }
+            }
+            
         }
 
     }

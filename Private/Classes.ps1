@@ -11,6 +11,7 @@ class Provisioning {
     [bool]$RebootAfterEachScript
     [bool]$RebootAfterLastScript = $true
     [bool]$RebuildOnValidationFailure
+    [bool]$RebuildOnProvisionFailure
     [string[]]$Scripts
 }
 
