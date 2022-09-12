@@ -93,9 +93,9 @@ function Publish-HyperDeploy {
             }
         }
 
-        Test-HyperVServers -HyperVServers ($servers | Get-Unique)
-        Publish-VMs -HyperVServers ($servers | Select-Object -ExpandProperty Name | Get-Unique) -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -Destroy $Destroy -ReplaceUpFront $ReplaceUpFront -ContinueOnError $ContinueOnError
-        Clear-TempFiles -HyperVServers ($servers | Select-Object -ExpandProperty Name | Get-Unique)
+        Test-HyperVServers -HyperVServers ($servers | Select-Object -Property Name -Unique)
+        Publish-VMs -HyperVServers ($servers | Select-Object -ExpandProperty Name | Select-Object -Unique) -VMs $definition.VMs -DeploymentOptions $definition.DeploymentOptions -Replace $Replace  -Force $Force -Destroy $Destroy -ReplaceUpFront $ReplaceUpFront -ContinueOnError $ContinueOnError
+        Clear-TempFiles -HyperVServers ($servers | Select-Object -ExpandProperty Name | Select-Object -Unique)
     }
 
 }
