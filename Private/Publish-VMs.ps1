@@ -110,8 +110,6 @@ function Publish-VMs {
         $vmReplicaName = $VMs[0].Name
         foreach ($replicasRequired in $VMs.Where{ $_.Replicas -gt 0 }) {
 
-            
-
             $VMList.Remove($replicasRequired)
             $startReplicas = $replicasRequired.Replicas
 
