@@ -165,11 +165,17 @@ function Initialize-VM {
         
                 if ($VM.Provisioning.RebootAfterEachScript ) {
 
+                    Write-Verbose "Rebooting $VMName"
+                    
                     if (($VM.Provisioning.RebootAfterLastScript -eq $true) -or ($VM.Provisioning.RebootAfterLastScript -eq $false -and $lastScript -eq $false)) {
                         Stop-VM -Name  $VMName -ComputerName $HyperVServer.Name -Force -ErrorAction Stop
                         Start-VM -Name  $VMName -ComputerName $HyperVServer.Name -ErrorAction Stop
                 
-                        Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
+                        if ($lastScript -eq $false) {
+                            Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
+                        }else{
+                            Write-Host "$script is last script, not waiting for VM to be responsive"
+                        }
                     }
 
                 
