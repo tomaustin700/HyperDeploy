@@ -54,9 +54,10 @@ function Publish-HyperDeploy {
 
     #Requires -RunAsAdministrator
 
-    try{
+    try {
         Get-VM | Out-Null
-    }catch{
+    }
+    catch {
         write-host "Hyper-V module not installed, please install and try again"
         exit
     }
@@ -81,13 +82,13 @@ function Publish-HyperDeploy {
 
             foreach ($server in $vm.HyperVServers) {
                 
-                if ($null -eq $server.Name){
+                if ($null -eq $server.Name) {
                     $server.Name = "localhost"
                 }
                 
                 $servers += $server
 
-                if (!$server.MaxReplicas) {
+                if ($null -eq $server.MaxReplicas) {
                     $server.MaxReplicas = 9999999
                 }
             }
