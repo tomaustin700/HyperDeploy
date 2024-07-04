@@ -29,7 +29,7 @@ function Wait-ForResponsiveVM {
     Wait-ForOKHeartbeat -VM $VM -HyperVServer $HyperVServer
 
     #Wait for DHCP to assign IP
-    while ((Get-VMNetworkAdapter -VMName $VM.Name -ComputerName $HyperVServer.Name).IpAddresses.Count -eq 0) {
+    while ($null -eq ((Get-VMNetworkAdapter -VMName $VM.Name -ComputerName $HyperVServer.Name).IpAddresses | Where-Object { $_ -notmatch ':' } | Select-Object -First 1)) {
         Start-Sleep -Seconds 1
 
         $name = $VM.Name
@@ -183,6 +183,7 @@ function Initialize-VM {
                 }
             }
             catch {
+                $_
                 write-host "Provision failed"
                 if ($VM.Provisioning.$RebuildOnProvisionFailure -eq $true) {
                     throw "$VMName failed provision process - REBUILD NEEDED"

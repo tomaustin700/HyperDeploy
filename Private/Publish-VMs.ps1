@@ -137,7 +137,7 @@ function Publish-VMs {
                 $replica.Name = $replica.Name + $replicaStartIndex
                 $replica.Replicas = 0
                 $replica.ReplicaGuid = $guid
-                $orginalServers = $replica.HyperVServers
+                $orginalServers = $replica.HyperVServers | Where-Object { $_.MaxReplicas -gt 0 }
 
                 $allocatedServer = $replica.HyperVServers[$hyperVIndex]
                 $replica.HyperVServers = @()
