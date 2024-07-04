@@ -38,7 +38,7 @@ function Wait-ForResponsiveVM {
     }
 
     #Get VM IP Address
-    $IP = (Get-VMNetworkAdapter -VMName $VM.Name -ComputerName $HyperVServer.Name).IpAddresses[0] 
+    $IP = (Get-VMNetworkAdapter -VMName $VM.Name -ComputerName $HyperVServer.Name).IpAddresses | Where-Object { $_ -notmatch ':' } | Select-Object -First 1
 
     write-Verbose "IP is $IP"
     Write-Verbose "Waiting for WinRM"
@@ -173,7 +173,8 @@ function Initialize-VM {
                 
                         if ($lastScript -eq $false) {
                             Wait-ForResponsiveVM -VM $VM -HyperVServer $HyperVServer
-                        }else{
+                        }
+                        else {
                             Write-Host "$script is last script, not waiting for VM to be responsive"
                         }
                     }
