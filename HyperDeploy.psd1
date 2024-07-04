@@ -27,7 +27,7 @@ Author = 'Tom Austin'
 CompanyName = 'Unknown'
 
 # Copyright statement for this module
-Copyright = '(c) 2022 Tom Austin. All rights reserved.'
+Copyright = '(c) 2024 Tom Austin. All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'Infrastructure as Code tool for Microsoft Hyper-V'
